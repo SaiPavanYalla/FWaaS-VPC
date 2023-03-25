@@ -2,13 +2,8 @@ import os
 import json
 import shutil
 import ipaddress
-
+import ansible_runner
 import subprocess
-
-
-
-
-
 
 # get the current working directory
 cwd = os.getcwd()
@@ -59,28 +54,48 @@ for tenant in  network_data:
 
 
 #print(vm_list)
-#print(network_list)
+print(network_list)
+
+inventory_path = os.path.join(cwd, "inventory.ini")
 
 
-playbook_path = os.path.join(cwd, "ansible_scripts","test.yml")
-print(playbook_path)
-inventory_path = os.path.join(cwd, "ansible_scripts","inventory.ini")
-print(inventory_path)
-extra_vars = {"var1": "value1", "var2": "value2"}
+#First step is to create networks
+for tenant in  network_data:
+    playbook_path = os.path.join(cwd, "ansible_scripts","create_net_lib_route.yml")
+    for network in network_data[tenant]["Networks"]:
+            if network["status"] == "Pending":
 
+                net= network['network_name']
+                mask=  network['mask']
+                network = ipaddress.IPv4Network((network['subnet'], mask))
+                start = network.network_address + 2
+                end = network.broadcast_address - 1
+                gw= network.network_address + 1
+            
+                extra_vars = {'net': net  , 'mask': mask ,'gw': gw ,'start': start ,'end': end }
 
+                command = ['ansible-playbook', playbook_path ,'-i', inventory_path]
 
-command = ['ansible-playbook', '-i', inventory_path, playbook_path]
+                for key, value in extra_vars.items():
+                    command.extend(['-e', f'{key}={value}'])
 
-for key, value in extra_vars.items():
-    command.append("-e")
-    command.append(f"{key}={value}")
+                
 
-process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-stdout, stderr = process.communicate()
-if process.returncode != 0:
-    print(f"Ansible playbook failed with error: {stderr.decode('utf-8')}")
-else:
-    print(f"Ansible playbook succeeded with output: {stdout.decode('utf-8')}")
+                process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                stdout, stderr = process.communicate()
 
+                if process.returncode != 0:
+                    output = stderr.decode('utf-8') if stderr else stdout.decode('utf-8')
+                    network["status"] = "Pending"
+                    #print(f"Ansible playbook failed with error:\n{output}")
+                else:
+                    #print(f"Ansible playbook succeeded with output:\n{stdout.decode('utf-8')}")
+                    network["status"] = "Completed"
+                
+                #print("Status: ", network['status'])
+                #print("Tenant Name: ", network['tenant_name'])
+                #print("Tenant Code: ", network['tenant_code'])
+            
+        
 
+        
