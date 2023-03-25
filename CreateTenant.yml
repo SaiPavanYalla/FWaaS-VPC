@@ -33,9 +33,6 @@
     - name: assign as DHClient for veth_t
       command: ip netns exec T1 dhclient PGW_T1_veth1
 
-    - name: Set IP Route on veth_pgw
-      command: ip netns exec {{ namespace_tenant }} ip route add default via {{ veth_defroute }} dev {{ veth_t }}
-
     - name: Create folder for Namespace
       become: true
       file:
