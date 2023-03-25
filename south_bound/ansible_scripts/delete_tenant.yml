@@ -1,0 +1,30 @@
+---
+- name: Create Tenant Namespace
+  hosts: localhost
+  become: true
+
+  vars:
+    bridge_pgw: BR_PGW_T
+    veth_pgw: PGW_{{namespace_tenant}}_veth0
+    veth_t: PGW_{{namespace_tenant}}_veth1
+    veth_defroute: 10.3.6.1
+
+  tasks:
+    - name: Delete Namespace
+      command: ip netns del {{ namespace_tenant }}
+
+
+    - name: Delete OVS PGW Bridge interface
+      command: ovs-vsctl del-port {{ bridge_pgw }}  {{ veth_pgw }}
+
+    - name: Delete Namespace folder
+      file:
+        path: "/etc/netns/{{ namespace_tenant }}"
+        state: absent
+
+
+
+
+
+
+
