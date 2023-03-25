@@ -2,7 +2,6 @@ import os
 import json
 import shutil
 import ipaddress
-import ansible_runner
 import subprocess
 
 # get the current working directory
