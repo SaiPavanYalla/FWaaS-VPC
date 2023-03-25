@@ -2,9 +2,10 @@
 - name: Create Tenant Namespace
   hosts: localhost
   become: true
+  become_method: sudo
+  become_user: csc792
 
   vars:
-    namespace_tenant: T1
     bridge_pgw: BR_PGW_T
     veth_pgw: PGW_T1_veth0
     veth_t: PGW_T1_veth1
