@@ -1,31 +1,33 @@
 - name: Create libvirt network with route mode
   hosts: localhost
   become: true
+  become_method: sudo
+  become_user: csc792
 
   tasks:
   - name: Create XML file for the network
     become: true
     copy:
-      dest: "{{ vm_net }}.xml"
+      dest: "{{ net }}.xml"
       content: |
           <network>
-            <name>{{ vm_net }}</name>
+            <name>{{ net }}</name>
             <forward mode='route'/>
-            <bridge name="{{ vm_net }}"/>
+            <bridge name="{{ net }}"/>
             <ip address="{{ gw }}" netmask="{{ mask }}">
               <dhcp>
-                <range start="{{ dhcp_start }}" end="{{ dhcp_end }}"/>
+                <range start="{{ start }}" end="{{ end }}"/>
               </dhcp>
             </ip>
           </network>
   - name: define libvirt network
     become: true
-    command: virsh net-define "{{ vm_net }}".xml
+    command: virsh net-define "{{ net }}".xml
 
   - name: Start libvirt network
     become: true
-    command: virsh net-start "{{ vm_net }}"
+    command: virsh net-start "{{ net }}"
 
   - name: Autostart libvirt network
     become: true
-    command: virsh net-autostart "{{ vm_net }}"
+    command: virsh net-autostart "{{ net }}"
