@@ -1,0 +1,6 @@
+<interface type='bridge'>
+<source bridge="{{ vm_net }}"/>
+<virtualport type='openvswitch'/>
+<model type='virtio'/>
+<target dev="{{ vm_net }}-{{ vm_name[:1] }}{{ vm_name[-1:] }}" />
+</interface>
