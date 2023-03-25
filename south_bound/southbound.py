@@ -54,7 +54,7 @@ for tenant in  network_data:
 
 
 #print(vm_list)
-print(network_list)
+#print(network_list)
 
 inventory_path = os.path.join(cwd, "inventory.ini")
 
@@ -62,7 +62,9 @@ inventory_path = os.path.join(cwd, "inventory.ini")
 #First step is to create networks
 for tenant in  network_data:
     playbook_path = os.path.join(cwd, "ansible_scripts","create_net_lib_route.yml")
+    i=0
     for network in network_data[tenant]["Networks"]:
+        i=i+1
             if network["status"] == "Pending":
 
                 net= network['network_name']
@@ -86,16 +88,18 @@ for tenant in  network_data:
 
                 if process.returncode != 0:
                     output = stderr.decode('utf-8') if stderr else stdout.decode('utf-8')
-                    network["status"] = "Pending"
+                    network_data[tenant]["Networks"][i]["status"] = "Pending"
                     #print(f"Ansible playbook failed with error:\n{output}")
                 else:
                     #print(f"Ansible playbook succeeded with output:\n{stdout.decode('utf-8')}")
-                    network["status"] = "Completed"
+                    network_data[tenant]["Networks"][i]["status"] = "Completed"
                 
                 #print("Status: ", network['status'])
                 #print("Tenant Name: ", network['tenant_name'])
                 #print("Tenant Code: ", network['tenant_code'])
             
-        
+     
 
-        
+with open(network_json_file_path, "w") as outfile:
+    # write the JSON data to the file
+    json.dump(network_data, outfile)       
