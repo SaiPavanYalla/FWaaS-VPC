@@ -2,12 +2,13 @@
 - name: Create Tenant Namespace
   hosts: localhost
   become: true
+  become_method: sudo
+  become_user: csc792
 
   vars:
-    namespace_tenant: T1
     bridge_pgw: BR_PGW_T
-    veth_pgw: PGW_T1_veth0
-    veth_t: PGW_T1_veth1
+    veth_pgw: PGW_{{namespace_tenant}}_veth0
+    veth_t: PGW_{{namespace_tenant}}_veth1
     veth_defroute: 10.3.6.1
 
   tasks:
@@ -34,7 +35,6 @@
       command: ip netns exec T1 dhclient PGW_T1_veth1
 
     - name: Create folder for Namespace
-      become: true
       file:
         path: "/etc/netns/{{ namespace_tenant }}"
         state: directory
