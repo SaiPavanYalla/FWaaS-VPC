@@ -4,7 +4,7 @@
   become: true
 
   vars:
-    namespace_name: T1
+    namespace_tenant: T1
     bridge_pgw: BR_PGW_T
     veth_pgw: PGW_T1_veth0
     veth_t: PGW_T1_veth1
@@ -12,13 +12,13 @@
 
   tasks:
     - name: Create Namespace
-      command: ip netns add {{ namespace_name }}
+      command: ip netns add {{ namespace_tenant }}
 
     - name: Create veth pair
       command: ip link add {{ veth_pgw }} type veth peer name {{ veth_t }}
 
     - name: Move veth_t to Namespace
-      command: ip link set {{ veth_t }} netns {{ namespace_name }}
+      command: ip link set {{ veth_t }} netns {{ namespace_tenant }}
 
     - name: Move veth_pgw to OVS PGW Bridge
       command: ovs-vsctl add-port {{ bridge_pgw }}  {{ veth_pgw }}
@@ -28,15 +28,15 @@
       command: ip link set dev {{ veth_pgw }} up
 
     - name: Bring up veth_t
-      command: ip netns exec {{ namespace_name }} ip link set dev {{ veth_t }} up
+      command: ip netns exec {{ namespace_tenant }} ip link set dev {{ veth_t }} up
 
     - name: assign as DHClient for veth_t
-      command: sudo ip netns exec T1 dhclient PGW_T1_veth1
+      command: ip netns exec T1 dhclient PGW_T1_veth1
 
     - name: Create folder for Namespace
       become: true
       file:
-        path: "/etc/netns/{{ namespace_name }}"
+        path: "/etc/netns/{{ namespace_tenant }}"
         state: directory
     
 

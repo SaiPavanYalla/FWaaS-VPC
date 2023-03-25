@@ -4,8 +4,11 @@
   become: yes
   vars:
     namespace_tenant: T1
-    vm_net: "{{ namespace_tenant }}_BR0"
-    tenant_gw: 10.3.3.1
+    vm_net: "BR_{{ namespace_tenant }}"
+    tenant_net_gw_ip: 10.3.3.1/24
+    dhcp_start: 10.3.3.2
+    dhcp_end: 10.3.3.254
+    dhcp_mask: 255.255.255.0
   tasks:
     - name: Create OVS bridge
       openvswitch_bridge:
@@ -30,6 +33,9 @@
     - name: Bring up veth_t
       command: ip netns exec {{ namespace_tenant }} ip link set dev veth_{{ namespace_tenant }} up
 
+    - name: Assign IP address
+      command: ip netns exec {{ namespace_tenant }} ip addr add {{ tenant_net_gw_ip }} dev veth_{{ namespace_tenant }}
+
     - name: Create the DHCP file in Namespace
       become: true
       file:
@@ -52,7 +58,7 @@
         - "except-interface=lo"
         - "bind-dynamic"
         - "interface=veth_{{ namespace_tenant }}"
-        - "dhcp-range=10.3.6.2,10.3.6.254,255.255.255.0"
+        - "dhcp-range={{dhcp_start}},{{dhcp_end}},{{dhcp_mask}}"
         - "dhcp-no-override"
         - "dhcp-authoritative"
         - "dhcp-lease-max=253"
@@ -60,4 +66,4 @@
 
 
     - name: run the DHCP file with dnsmasq
-      command: "ip netns exec {{ namespace_tenant }} dnsmasq -C /etc/netns/{{ namespace_tenant }}/{{ namespace_tenant }}_{{ vm_net }}.conf"
+      command: "ip netns exec {{namespace_tenant}} dnsmasq -C /etc/netns/{{namespace_tenant}}/{{namespace_tenant}}_{{vm_net}}.conf"
