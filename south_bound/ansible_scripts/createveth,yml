@@ -1,0 +1,12 @@
+- hosts: localhost
+  gather_facts: no
+  remote_user: ubuntu
+  become: yes
+  tasks:
+  
+  - name: Creating veth pair "{{ veth1 }}" - "{{ veth2 }}"
+    command: sudo ip link add dev "{{ veth1 }}" type veth peer name "{{ veth2 }}"
+  - name: Bringing up interface 1  
+    command: sudo ip link set dev "{{ veth1 }}" up
+  - name: Bringing up interface 2
+    command: sudo ip link set dev "{{ veth2 }}" up

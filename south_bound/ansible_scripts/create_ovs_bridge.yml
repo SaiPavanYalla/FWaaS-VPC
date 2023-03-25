@@ -1,0 +1,63 @@
+---
+- name: Create and configure OVS bridge
+  hosts: localhost
+  become: yes
+  vars:
+    namespace_tenant: T1
+    vm_net: "{{ namespace_tenant }}_BR0"
+    tenant_gw: 10.3.3.1
+  tasks:
+    - name: Create OVS bridge
+      openvswitch_bridge:
+        bridge: "{{ vm_net }}"
+        state: present
+
+    - name: Set OVS interface to UP
+      command: "ip link set {{ vm_net }} up"
+
+    - name: Create veth pair
+      command: ip link add veth_{{ vm_net }} type veth peer name veth_{{ namespace_tenant }}
+
+    - name: Move veth peer to Namespace
+      command: ip link set veth_{{ namespace_tenant }} netns {{ namespace_tenant }}
+
+    - name: Move veth_pgw to OVS PGW Bridge
+      command: ovs-vsctl add-port {{ vm_net }}  veth_{{ vm_net }}
+
+    - name: Bring up veth peer
+      command: ip link set dev veth_{{ vm_net }} up
+
+    - name: Bring up veth_t
+      command: ip netns exec {{ namespace_tenant }} ip link set dev veth_{{ namespace_tenant }} up
+
+    - name: Create the DHCP file in Namespace
+      become: true
+      file:
+        path: "/etc/netns/{{ namespace_tenant }}/{{ namespace_tenant }}_{{ vm_net }}.conf"
+        state: touch
+
+
+    - name: Create an empty PGWdhcpd.conf file in Host
+      file:
+        path: "/etc/{{ namespace_tenant }}_{{ vm_net }}.conf"
+        state: touch
+
+    - name: Add lines to DHCP file
+      lineinfile:
+        path: "/etc/netns/{{ namespace_tenant }}/{{ namespace_tenant }}_{{ vm_net }}.conf"
+        line: "{{ item }}"
+      with_items:
+        - "strict-order"
+        - "user=libvirt-dnsmasq"
+        - "except-interface=lo"
+        - "bind-dynamic"
+        - "interface=veth_{{ namespace_tenant }}"
+        - "dhcp-range=10.3.6.2,10.3.6.254,255.255.255.0"
+        - "dhcp-no-override"
+        - "dhcp-authoritative"
+        - "dhcp-lease-max=253"
+
+
+
+    - name: run the DHCP file with dnsmasq
+      command: "ip netns exec {{ namespace_tenant }} dnsmasq -C /etc/netns/{{ namespace_tenant }}/{{ namespace_tenant }}_{{ vm_net }}.conf"

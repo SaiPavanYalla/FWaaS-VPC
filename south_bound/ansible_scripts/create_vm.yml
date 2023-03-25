@@ -1,0 +1,59 @@
+---
+- name: Ensure requirements in place
+  hosts: localhost
+  become: yes
+  vars:
+    libvirt_pool_dir: "/var/lib/libvirt/images"
+    src_dir: "/home/csc792/tempimage"
+  tasks:
+    - name: Install packages
+      package:
+        name:
+          - libguestfs-tools
+          - python3-libvirt
+        state: present
+
+    - name: Get VMs list
+      community.libvirt.virt:
+        command: list_vms
+      register: existing_vms
+      changed_when: no
+    - name: Copy base image to libvirt directory
+      copy:
+        dest: "{{ libvirt_pool_dir }}/{{ vm_name }}.qcow2"
+        src: "{{ src_dir }}/vm-template.qcow2"
+        force: no
+        remote_src: yes
+        mode: 0660
+      register: copy_results
+
+    - name: Get VMs list
+      command: "qemu-img resize {{ libvirt_pool_dir }}/{{ vm_name }}.qcow2 {{ vm_disksize_gb }}G"
+      when: vm_disksize_gb > 10
+
+    - name: Configure the image
+      command: |
+        virt-customize -a {{ libvirt_pool_dir }}/{{ vm_name }}.qcow2 \
+        --hostname {{ vm_name }} \
+        --no-network \
+        --firstboot-command "apt-get update" -x
+      when: copy_results is changed
+
+    - name: Create a new Ubuntu VM
+      block:
+
+        - name: define the new VM
+          virt:
+            command: define
+            autostart: yes
+            xml: "{{ lookup('template', '{{ src_dir }}/vm-template.xml.j2') }}"
+
+        - name: Start the new VM
+          virt:
+            name: "{{ vm_name }}"
+            state: running
+
+        - name: report created result
+          debug:
+            msg: "{{ vm_name }} created successfully"
+

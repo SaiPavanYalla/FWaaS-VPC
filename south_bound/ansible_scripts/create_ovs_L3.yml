@@ -1,0 +1,16 @@
+---
+- name: Create and configure OVS bridge
+  hosts: localhost
+  become: yes
+  tasks:
+    - name: Create OVS bridge
+      openvswitch_bridge:
+        bridge: "{{ vm_net }}"
+        state: present
+
+    - name: Set OVS interface to UP
+      command: "ip link set {{ vm_net }} up"
+      
+
+    - name: Set IP address on OVS interface
+      command: "ip addr add {{ gw }}/24 dev {{ vm_net }}"

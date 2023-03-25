@@ -1,0 +1,31 @@
+- name: Create libvirt network with route mode
+  hosts: localhost
+  become: true
+
+  tasks:
+  - name: Create XML file for the network
+    become: true
+    copy:
+      dest: "{{ vm_net }}.xml"
+      content: |
+          <network>
+            <name>{{ vm_net }}</name>
+            <forward mode='route'/>
+            <bridge name="{{ vm_net }}"/>
+            <ip address="{{ gw }}" netmask="{{ mask }}">
+              <dhcp>
+                <range start="{{ dhcp_start }}" end="{{ dhcp_end }}"/>
+              </dhcp>
+            </ip>
+          </network>
+  - name: define libvirt network
+    become: true
+    command: virsh net-define "{{ vm_net }}".xml
+
+  - name: Start libvirt network
+    become: true
+    command: virsh net-start "{{ vm_net }}"
+
+  - name: Autostart libvirt network
+    become: true
+    command: virsh net-autostart "{{ vm_net }}"

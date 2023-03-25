@@ -1,0 +1,133 @@
+---
+- name: Create PGW Namespace
+  hosts: localhost
+  become: true
+
+  vars:
+    namespace_name: PGW
+    veth_host: H_PGW_veth0
+    veth_ns: H_PGW_veth1
+    veth_host_ip: 10.0.0.1/30
+    veth_ns_ip: 10.0.0.2/30
+    veth_defroute: 10.0.0.1
+    bridge_pgw: BR_PGW_T
+    bridge_pgw_brInt: br_pgw_t_veth0
+    bridge_pgw_pgwInt: br_pgw_t_veth1
+    bridge_pgw_pgwInt_IP: 10.3.6.1/24
+
+  tasks:
+    - name: Create Namespace
+      command: ip netns add {{ namespace_name }}
+
+    - name: Create veth pair
+      command: ip link add {{ veth_host }} type veth peer name {{ veth_ns }}
+
+    - name: Move veth_ns to Namespace
+      command: ip link set {{ veth_ns }} netns {{ namespace_name }}
+
+    
+
+
+    - name: Bring up veth_host
+      command: ip link set dev {{ veth_host }} up
+
+    - name: Bring up veth_ns
+      command: ip netns exec {{ namespace_name }} ip link set dev {{ veth_ns }} up
+
+
+    - name: Set IP address on veth_host
+      command: ip addr add {{ veth_host_ip }} dev {{ veth_host }}
+
+    - name: Set IP address on veth_ns
+      command: ip netns exec {{ namespace_name }} ip addr add {{ veth_ns_ip }} dev {{ veth_ns }}
+
+
+
+    - name: Set IP Route on veth_ns
+      command: ip netns exec {{ namespace_name }} ip route add default via {{ veth_defroute }} dev {{ veth_ns }}
+
+
+    - name: Enable IP forwarding
+      sysctl:
+        name: net.ipv4.ip_forward
+        value: 1
+        state: present
+        reload: yes
+
+    - name: Configure NAT
+      command: iptables -t nat -I POSTROUTING 1 -s 10.0.0.0/30 ! -d 10.0.0.0/30 -j MASQUERADE
+
+
+
+    - name: Create OVS bridge PGW
+      openvswitch.openvswitch.openvswitch_bridge:
+        bridge: "{{ bridge_pgw }}"
+        state: present
+
+    
+    - name: Create veth pair PGW
+      command: ip link add {{ bridge_pgw_brInt }} type veth peer name {{ bridge_pgw_pgwInt }}
+
+    - name: Move veth_ns to Namespace
+      command: ip link set {{ bridge_pgw_pgwInt }} netns {{ namespace_name }}
+
+    
+    - name: Attach to OVS bridge
+      command: ovs-vsctl add-port {{ bridge_pgw }}  {{ bridge_pgw_brInt }}
+
+
+    - name: Bring up veth_host
+      command: ip link set dev {{ bridge_pgw_brInt }} up
+
+    - name: Bring up veth_ns
+      command: ip netns exec {{ namespace_name }} ip link set dev {{ bridge_pgw_pgwInt }} up
+
+
+
+    - name: Set IP address on veth_ns
+      command: ip netns exec {{ namespace_name }} ip addr add {{ bridge_pgw_pgwInt_IP }} dev {{ bridge_pgw_pgwInt }}
+
+
+
+    - name: Create folder for Namespace
+      become: true
+      file:
+        path: "/etc/netns/{{ namespace_name }}"
+        state: directory
+
+    - name: Create the PGWdhcpd.conf file in Namespace
+      become: true
+      file:
+        path: "/etc/netns/{{ namespace_name }}/PGWdhcpd.conf"
+        state: touch
+
+    
+    - name: Create an empty PGWdhcpd.conf file in Host
+      file:
+        path: "/etc/PGWdhcpd.conf"
+        state: touch
+
+    - name: Add lines to DHCP file
+      lineinfile:
+        path: "/etc/netns/{{ namespace_name }}/PGWdhcpd.conf"
+        line: "{{ item }}"
+      with_items:
+        - "strict-order"
+        - "user=libvirt-dnsmasq"
+        - "except-interface=lo"
+        - "bind-dynamic"
+        - "interface={{ bridge_pgw_pgwInt }}"
+        - "dhcp-range=10.3.6.2,10.3.6.254,255.255.255.0"
+        - "dhcp-no-override"
+        - "dhcp-authoritative"
+        - "dhcp-lease-max=253"
+
+
+
+    - name: run the DHCP file with dnsmasq
+      command: "ip netns exec {{ namespace_name }} dnsmasq -C /etc/netns/{{ namespace_name }}/PGWdhcpd.conf"
+
+
+
+
+

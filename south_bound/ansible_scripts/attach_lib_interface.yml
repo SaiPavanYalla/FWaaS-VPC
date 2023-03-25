@@ -1,0 +1,9 @@
+- name: attach libvirt networks to Guest VM
+  hosts: localhost
+  become: true
+  tasks:
+  - name: attach  network to guest VM
+    command: |
+      virsh attach-interface {{ vm_name }} bridge {{ vm_net }} --model virtio --config --live \
+      --target "{{ vm_net }}-{{ vm_name[:1] }}{{ vm_name[-1:] }}"
+

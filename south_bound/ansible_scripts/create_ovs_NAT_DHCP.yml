@@ -1,0 +1,49 @@
+---
+- name: Create and configure OVS bridge
+  hosts: localhost
+  become: yes
+  vars:
+    file_path: "/home/csc792/dhcp"
+  tasks:
+    - name: Create OVS bridge
+      openvswitch_bridge:
+        bridge: "{{ vm_net }}"
+        state: present
+
+    - name: Set OVS interface to UP
+      command: "ip link set {{ vm_net }} up"
+      
+
+    - name: Set IP address on OVS interface
+      command: "ip addr add {{ gw }}/24 dev {{ vm_net }}"
+
+    - name: Set up NAT
+      iptables:
+        chain: POSTROUTING
+        table: nat
+        source: '{{ subnet }}/24'
+        out_interface: enp1s0
+        jump: MASQUERADE
+
+    - name: Create DHCP file
+      file:
+        path: "{{ file_path }}"
+        state: touch
+
+    - name: Add lines to DHCP file
+      lineinfile:
+        path: "{{ file_path }}"
+        line: "{{ item }}"
+      with_items:
+        - "strict-order"
+        - "user=libvirt-dnsmasq"
+        - "except-interface=lo"
+        - "bind-dynamic"
+        - "interface={{ net_name }}"
+        - "dhcp-range={{ dhcp_start }},{{ dhcp_end }},255.255.255.0"
+        - "dhcp-no-override"
+        - "dhcp-authoritative"
+        - "dhcp-lease-max=253"
+
+    - name: run the DHCP file with dnsmasq
+      command: "dnsmasq -C {{ file_path }}"

@@ -1,0 +1,15 @@
+- name: Create and configure OVS bridge
+  hosts: localhost
+  become: yes
+  vars:
+    vm_name: "Guest-VM4"
+    vm_net: "L3"
+
+  tasks:
+    - name: push network template
+      template:
+        src: /home/csc792/FwaaS-VPC/interface-template.xml.j2
+        dest: "/home/csc792/FwaaS-VPC/{{ vm_net}}.xml"
+
+    - name: attach network to VM
+      command: virsh attach-device {{ vm_name}} /home/csc792/FwaaS-VPC/{{ vm_net}}.xml --live --config
