@@ -4,26 +4,26 @@
     "VMs": [
         {
             
-            "vm_name": "GuestVM1",
+            "vm_name": "GuestVM3",
             "vm_vcpus": "2",
             "vm_ram_mb": "2048",
             "vm_disk_size" :"default", 
             "connections": [
                 {
-                    "Connected_to": ["net1" ,"net2"]
+                    "Connected_to": ["net3" ,"net4"]
                 }
             ]
         },
 
         {
             
-            "vm_name": "GuestVM2",
+            "vm_name": "GuestVM4",
             "vm_vcpus": "2",
             "vm_ram_mb": "2048", 
             "vm_disk_size" :"default",
             "connections": [
                 {
-                    "Connected_to": ["net2"]
+                    "Connected_to": ["net3","net4"]
                     
                 }
             ]
@@ -34,24 +34,24 @@
         "Networks" : [
 
           {
-            "network_name": "net1",
-            "subnet": "192.168.1.0",
-            "mask" : "24",
+            "network_name": "net3",
+            "subnet": "192.168.13.0",
+            "mask" : "255.255.255.0",
             "connections": [
                 {
-                    "Connected_to": ["GuestVM1","GuestVM2" ]
+                    "Connected_to": ["GuestVM3","GuestVM4" ]
                     
                 }
             ]
         },
           {
 
-            "network_name": "net2",
-            "subnet": "192.168.2.0",
-            "mask" : "24",
+            "network_name": "net4",
+            "subnet": "192.168.14.0",
+            "mask" : "255.255.255.0",
             "connections": [
                 {
-                    "Connected_to": ["GuestVM2"]   
+                    "Connected_to": ["GuestVM3","GuestVM4"]   
                 }
             ]
           

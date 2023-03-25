@@ -49,7 +49,7 @@ network_list =[]
 
 # Iterate through each network and get its properties
 for network in networks:
-    network["status"] = "Pending"
+    network["status"] = "Ready"
     network_list.append(network['network_name'])
 
     if not validate_subnet_mask(network['mask']):
@@ -69,7 +69,7 @@ for network in networks:
 
 # Iterate through each VM and get its properties
 for vm in vms:
-    vm["status"] = "Pending"
+    vm["status"] = "Ready"
     vm_list.append(vm['vm_name'])
     #vm_name = vm['vm_name']
     #vm_vcpus = vm['vm_vcpus']
