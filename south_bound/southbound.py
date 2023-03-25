@@ -64,39 +64,40 @@ for tenant in  network_data:
     playbook_path = os.path.join(cwd, "ansible_scripts","create_net_lib_route.yml")
     i=0
     for network in network_data[tenant]["Networks"]:
-        i=i+1
-            if network["status"] == "Pending":
+        
+        if network["status"] == "Ready":
 
-                net= network['network_name']
-                mask=  network['mask']
-                network = ipaddress.IPv4Network((network['subnet'], mask))
-                start = network.network_address + 2
-                end = network.broadcast_address - 1
-                gw= network.network_address + 1
+            net= network['network_name']
+            mask=  network['mask']
+            network = ipaddress.IPv4Network((network['subnet'], mask))
+            start = network.network_address + 2
+            end = network.broadcast_address - 1
+            gw= network.network_address + 1
+        
+            extra_vars = {'net': net  , 'mask': mask ,'gw': gw ,'start': start ,'end': end }
+
+            command = ['ansible-playbook', playbook_path ,'-i', inventory_path]
+
+            for key, value in extra_vars.items():
+                command.extend(['-e', f'{key}={value}'])
+
             
-                extra_vars = {'net': net  , 'mask': mask ,'gw': gw ,'start': start ,'end': end }
+            network_data[tenant]["Networks"][i]["status"] = "Running"
+            process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            stdout, stderr = process.communicate()
 
-                command = ['ansible-playbook', playbook_path ,'-i', inventory_path]
-
-                for key, value in extra_vars.items():
-                    command.extend(['-e', f'{key}={value}'])
-
-                
-
-                process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                stdout, stderr = process.communicate()
-
-                if process.returncode != 0:
-                    output = stderr.decode('utf-8') if stderr else stdout.decode('utf-8')
-                    network_data[tenant]["Networks"][i]["status"] = "Pending"
-                    #print(f"Ansible playbook failed with error:\n{output}")
-                else:
-                    #print(f"Ansible playbook succeeded with output:\n{stdout.decode('utf-8')}")
-                    network_data[tenant]["Networks"][i]["status"] = "Completed"
-                
-                #print("Status: ", network['status'])
-                #print("Tenant Name: ", network['tenant_name'])
-                #print("Tenant Code: ", network['tenant_code'])
+            if process.returncode != 0:
+                output = stderr.decode('utf-8') if stderr else stdout.decode('utf-8')
+                network_data[tenant]["Networks"][i]["status"] = "Ready"
+                print(f"Ansible playbook failed with error:\n{output}")
+            else:
+                #print(f"Ansible playbook succeeded with output:\n{stdout.decode('utf-8')}")
+                network_data[tenant]["Networks"][i]["status"] = "Completed"
+        
+        i=i+1
+            #print("Status: ", network['status'])
+            #print("Tenant Name: ", network['tenant_name'])
+            #print("Tenant Code: ", network['tenant_code'])
             
      
 
