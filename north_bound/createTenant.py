@@ -71,19 +71,22 @@ playbook_path = os.path.join(parent_dir,"south_bound", "ansible_scripts","create
 extra_vars = {'namespace_tenant': namespace   }
 
 
-command = ['ansible-playbook', playbook_path ,'-i', inventory_path]
+command = ['sudo','ansible-playbook', playbook_path ,'-i', inventory_path]
 
 for key, value in extra_vars.items():
     command.extend(['-e', f'{key}={value}'])
 
-process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-stdout, stderr = process.communicate()
+sudo_password = "mmrj2023"
+
+
+process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
+stdout, stderr = process.communicate(sudo_password.encode())
 
 if process.returncode != 0:
     output = stderr.decode('utf-8') if stderr else stdout.decode('utf-8')    
     print(f"Tenant creation failed with error:\n{output}")
 else:
-    print(f"Tenant creation successfull with output:\n{stdout.decode('utf-8')}")
+    print(f"Tenant creation successfull for "+ tenant_name)
 
 
 
