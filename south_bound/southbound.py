@@ -83,13 +83,14 @@ for tenant in  network_data:
         if vm["status"] == "Ready":
 
          
-            vm_name = vm["vm_name"]
+            hostname =  vm["vm_name"]
+            namespace_tenant =  network_data[tenant]["namespace_tenant"]
             vm_vcpus = vm["vm_vcpus"]
             src_dir = os.path.join(cwd , "templates")
             vm_ram_mb =  vm["vm_ram_mb"]
             vm_disksize_gb = int(vm["vm_disk_size"])
 
-            extra_vars = {'vm_name': vm_name  , 'vm_vcpus': vm_vcpus ,'src_dir': src_dir ,'vm_ram_mb': vm_ram_mb ,'vm_disksize_gb': vm_disksize_gb }
+            extra_vars = {'hostname': hostname,'namespace_tenant' : namespace_tenant , 'vm_vcpus': vm_vcpus ,'src_dir': src_dir ,'vm_ram_mb': vm_ram_mb ,'vm_disksize_gb': vm_disksize_gb }
 
             command = ['sudo','ansible-playbook', playbook_path ,'-i', inventory_path]
             sudo_password = "mmrj2023"
@@ -125,10 +126,10 @@ for tenant in  network_data:
                         if network["status"] == "Completed":
                             if vm["connection_status"][connection] == "Ready": 
                                 namespace_tenant = network_data[tenant]["namespace_tenant"]
-                                vm_name = vm["vm_name"]
+                                hostname = vm["vm_name"]
                                 vm_net_name = connection
                                 src_dir= os.path.join(cwd , "templates")
-                                extra_vars = {'vm_name': vm_name  , 'namespace_tenant': namespace_tenant ,'src_dir': src_dir ,'vm_net_name': vm_net_name }
+                                extra_vars = {'hostname': hostname  , 'namespace_tenant': namespace_tenant ,'src_dir': src_dir ,'vm_net_name': vm_net_name }
 
                                 command = ['sudo','ansible-playbook', playbook_path ,'-i', inventory_path]
                                 sudo_password = "mmrj2023"
