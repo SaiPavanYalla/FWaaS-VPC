@@ -58,6 +58,7 @@
         - "dhcp-no-override"
         - "dhcp-authoritative"
         - "dhcp-lease-max=253"
+        - "dhcp-lease-time=12h"
 
 
 
