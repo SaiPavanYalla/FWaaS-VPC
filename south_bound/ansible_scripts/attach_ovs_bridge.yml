@@ -2,11 +2,9 @@
   hosts: localhost
   become: yes
   vars:
-    namespace_tenant: T1
-    vm_name: "Guest-VM5"
-    vm_net_name: net1
+    
     vm_net: "{{ namespace_tenant }}_{{vm_net_name}}_BR"
-    src_dir: "/home/csc792/FwaaS-VPC"
+    
 
   tasks:
     - name: push network template

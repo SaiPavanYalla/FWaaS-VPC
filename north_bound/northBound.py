@@ -2,7 +2,7 @@ import os
 import json
 import shutil
 import ipaddress
-
+import datetime
 
 def validate_subnet_mask(subnet_mask):
     try:
@@ -22,7 +22,10 @@ with open('tenant_management.json', 'r') as file:
     # Parse the JSON data
     tenant_management_data = json.load(file)
 
-input_sample_json = "sample.json"
+
+
+
+input_sample_json = "inputTopology.json"
 
 # Open the file for reading
 with open(input_sample_json, 'r') as f:
@@ -50,10 +53,10 @@ if flag_if_present == False:
 tenant_data["namespace_tenant"] = namespace
 
 source_path = os.getcwd() + "/" + input_sample_json
-destination_path = os.getcwd() + "/" + tenant_name
+destination_path = os.path.join(os.getcwd(), "tenantTopology",tenant_name,str(datetime.datetime.now()))
 
-if not os.path.exists(destination_path):
-    os.makedirs(destination_path)
+if not os.path.exists(os.path.join(os.getcwd(), "tenantTopology"):
+    os.makedirs(os.path.join(os.getcwd(), "tenantTopology")
 
 shutil.copy(source_path,destination_path )
 
@@ -70,6 +73,8 @@ network_list =[]
 # Iterate through each network and get its properties
 for network in networks:
     network["status"] = "Ready"
+    
+        
     network_list.append(network['network_name'])
 
     if not validate_subnet_mask(network['mask']):
@@ -81,60 +86,119 @@ for network in networks:
         exit()
 
 
-    #network_name = network['network_name']
-    #subnet = network['subnet']
-    #mask = network['mask']
-    #connections = network['connections'][0]['Connected_to']
+   
 
 
 # Iterate through each VM and get its properties
 for vm in vms:
     vm["status"] = "Ready"
     vm_list.append(vm['vm_name'])
-    #vm_name = vm['vm_name']
-    #vm_vcpus = vm['vm_vcpus']
-    #vm_ram_mb = vm['vm_ram_mb']
-    #vm_disk_size = vm['vm_disk_size']
-    #connections = vm['connections'][0]['Connected_to']
-
-    
-for network in networks:
-    connections = network['connections'][0]['Connected_to']
-    for connection in connections:
-        if connection not in vm_list:
-            print(connection + " is not a valid device ")
-            exit()
-
-for vm in vms:
+    vm["connection_status"] ={}
     connections = vm['connections'][0]['Connected_to']
     for connection in connections:
-        if connection not in network_list:
-            print(connection + " is not a valid Network")
-            exit()
+        vm["connection_status"][connection] = "Ready" 
+
+
+#checking if VMs and Networks are duplicated or not in the sample.json file
+
+vm_duplicates = []
+network_duplicates = []
+
+for vm in vm_list:
+    if vm_list.count(vm) > 1 and vm not in vm_duplicates:
+        vm_duplicates.append(vm)
+
+for network in network_list:
+    if network_list.count(network) > 1 and network not in network_duplicates:
+        network_duplicates.append(network)
+
+
+
+if vm_duplicates:
+    print("These Guest VMs are duplicated in the Requirement File: ", vm_duplicates)
+    exit()
+
+if network_duplicates:
+    print("These Networks are duplicated in the Requirement File: ", network_duplicates)
+    exit()
+
+
+
+    
+
 
 
 tenant_data['VMs'] = vms
 tenant_data['Networks'] = networks
-  
-network_destination_path = os.getcwd() + "/" + "Network"
+
+
+#Now comes the appending part
+
+
+network_destination_path = os.path.join(os.getcwd(), "Network")
+
+existing_network_data ={}
 
 if not os.path.exists(network_destination_path):
     os.makedirs(network_destination_path)
 
+if os.path.exists(os.path.join(os.getcwd(), "Network","network.json")):
+    with open(os.path.join(os.getcwd(), "Network","network.json") , 'r') as file:
+        existing_network_data = json.load(file)
 
-if os.path.exists(network_destination_path + "/" + "network.json"):
-    with open(network_destination_path + "/" + "network.json", "r") as f:   
-        existing_data = json.load(f)
-        existing_data[tenant_name]= tenant_data
-    
-        with open(network_destination_path + "/" + "network.json", "w") as f1:
-            json.dump(existing_data, f1,indent=4)
 
+existing_vm_list=[]
+existing_network_list = []
+
+
+
+
+
+
+
+if existing_network_data:
+    if tenant_name in existing_network_data.keys():
+
+        #checking if the network or VM already exists in the Network.json
+        for network in existing_network_data[tenant_name]["Networks"]:
+            existing_network_list.append(network["network_name"])
+            if network["network_name"] in network_list:
+                print("The Network "+ network["network_name"] + "already exists in the Topology ")
+                exit()
+
+        for vm in existing_network_data[tenant_name]["VMs"]:
+            existing_vm_list.append(vm["vm_name"])
+            if vm["vm_name"] in vm_list:
+                print("The VM "+ vm["vm_name"] + "already exists in the Topology ")
+                exit()
+        
+        
+
+        for vm in vms:
+            connections = vm['connections'][0]['Connected_to']
+            all_network_list = network_list + existing_network_list
+            for connection in connections:
+                if connection not in all_network_list:
+                    print(connection + " is not a valid Network in yout Tenant")
+                    exit()
+
+        for network in tenant_data["Networks"]:
+            existing_network_data[tenant_name]["Networks"].append(network)
+        
+        for vm in tenant_data["VMs"]:
+            existing_network_data[tenant_name]["VMs"].append(vm)
+
+
+    else:
+        existing_network_data[tenant_name]= tenant_data
 else:
-    with open(network_destination_path + "/" + "network.json", "w") as f:
-        tenant_json_data ={}
-        tenant_json_data[tenant_name] = tenant_data
-        json.dump(tenant_json_data, f,indent=4)
+    existing_network_data[tenant_name]= tenant_data
+
+    
+with open(network_destination_path + "/" + "network.json", "w") as f1:
+    json.dump(existing_network_data, f1,indent=4)
+
+
 
 
 

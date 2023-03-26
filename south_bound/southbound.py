@@ -17,43 +17,8 @@ network_json_file_path  = os.path.join(parent_dir, "north_bound", "Network","net
 with open(network_json_file_path, 'r') as f:
     network_data = json.load(f)
 
-# vm_list = []
-# network_list = []
 
 
-# for tenant in  network_data:
-    
-#     #print("Tenant name: ", network_data[tenant]["tenant_name"])
-#     #print("Tenant code: ", network_data[tenant]["tenant_code"])
-#     for vm in network_data[tenant]["VMs"]:
-#         vm_obj=vm
-#         vm_obj["tenant_name"] = network_data[tenant]["tenant_name"]
-#         vm_obj["tenant_code"] = network_data[tenant]["tenant_code"]
-#         vm_obj["connections"] = vm["connections"][0]["Connected_to"]
-#         vm_list.append(vm)
-#         #print("VM name: ", vm["vm_name"])
-#         #print("vCPUs: ", vm["vm_vcpus"])
-#         #print("RAM (MB): ", vm["vm_ram_mb"])
-#         #print("Disk size: ", vm["vm_disk_size"])
-#         #print("Connections: ", vm["connections"][0]["Connected_to"])
-#         #print("Status: ", vm["status"])
-    
-#     for network in network_data[tenant]["Networks"]:
-#         network_obj=network
-#         network_obj["tenant_name"] = network_data[tenant]["tenant_name"]
-#         network_obj["tenant_code"] = network_data[tenant]["tenant_code"]
-#         network_obj["connections"] = network["connections"][0]["Connected_to"]
-#         network_list.append(network)
-#         #print("Network name: ", network["network_name"])
-#         #print("Subnet: ", network["subnet"])
-#         #print("Mask: ", network["mask"])
-#         #print("Connections: ", network["connections"][0]["Connected_to"])
-#         #print("Status: ", network["status"])
-    #print("")
-
-
-#print(vm_list)
-#print(network_list)
 
 inventory_path = os.path.join(cwd, "inventory.ini")
 
@@ -70,10 +35,10 @@ for tenant in  network_data:
         
             binary_octets = [bin(int(octet))[2:].zfill(8) for octet in mask.split(".")]
 
-            # Count the number of binary 1's in the subnet mask
+            
             cidr_prefix = sum([bin_octet.count("1") for bin_octet in binary_octets])
 
-            # Format the result as CIDR notation
+            
             cidr_notation = f"/{cidr_prefix}"
             ovs_network_address = ipaddress.IPv4Network((network['subnet'], mask))
 
@@ -105,7 +70,7 @@ for tenant in  network_data:
                 network_data[tenant]["Networks"][i]["status"] = "Ready"
                 print(f"Ansible playbook failed with error while creating network:\n{output}")
             else:
-                #print(f"Ansible playbook succeeded with output:\n{stdout.decode('utf-8')}")
+                
                 network_data[tenant]["Networks"][i]["status"] = "Completed"
         
         i=i+1
@@ -144,10 +109,54 @@ for tenant in  network_data:
                 network_data[tenant]["VMs"][j]["status"] = "Ready"
                 print(f"Ansible playbook failed with error while creating a VM :\n{output}")
             else:
-                #print(f"Ansible playbook succeeded with output:\n{stdout.decode('utf-8')}")
+                
                 network_data[tenant]["VMs"][j]["status"] = "Completed"
  
         j=j+1
+
+    k=0
+    playbook_path = os.path.join(cwd, "ansible_scripts","attach_ovs_bridge.yml")
+    for vm in network_data[tenant]["VMs"]:
+        if vm["status"] == "Completed":
+            for connection in vm["connections"][0]["Connected_to"]:
+                
+                for network in network_data[tenant]["Networks"]:
+                    if connection == network["network_name"]:
+                        if network["status"] == "Completed":
+                            if vm["connection_status"][connection] == "Ready": 
+                                namespace_tenant = network_data[tenant]["namespace_tenant"]
+                                vm_name = vm["vm_name"]
+                                vm_net_name = connection
+                                src_dir= os.path.join(cwd , "templates")
+                                extra_vars = {'vm_name': vm_name  , 'namespace_tenant': namespace_tenant ,'src_dir': src_dir ,'vm_net_name': vm_net_name }
+
+                                command = ['sudo','ansible-playbook', playbook_path ,'-i', inventory_path]
+                                sudo_password = "mmrj2023"
+
+                                for key, value in extra_vars.items():
+                                    command.extend(['-e', f'{key}={value}'])
+
+
+                                network_data[tenant]["VMs"][k]["connection_status"][connection] = "Running"
+                                
+
+                                process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
+                                stdout, stderr = process.communicate(sudo_password.encode())
+
+                                if process.returncode != 0:
+                                    output = stderr.decode('utf-8') if stderr else stdout.decode('utf-8')
+                                    network_data[tenant]["VMs"][k]["connection_status"][connection] = "Ready"
+                                    
+                                    print(f"Ansible playbook failed with error while creating a VM :\n{output}")
+                                else:
+                                    
+                                    network_data[tenant]["VMs"][k]["connection_status"][connection] = "Completed"
+                                    
+                    
+
+        k=k+1
+                
+
 
 
 with open(network_json_file_path, "w") as outfile:
