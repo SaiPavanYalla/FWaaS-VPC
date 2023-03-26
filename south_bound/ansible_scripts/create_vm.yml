@@ -4,7 +4,6 @@
   become: yes
   vars:
     libvirt_pool_dir: "/var/lib/libvirt/images"
-    src_dir: "/home/csc792/tempimage"
   tasks:
     - name: Install packages
       package:
@@ -28,8 +27,8 @@
       register: copy_results
 
     - name: Get VMs list
-      command: "qemu-img resize {{ libvirt_pool_dir }}/{{ vm_name }}.qcow2 {{ vm_disksize_gb }}G"
-      when: vm_disksize_gb > 10
+      command: "qemu-img resize {{ libvirt_pool_dir }}/{{ vm_name }}.qcow2 {{ vm_disksize_gb  }}G"
+      when: vm_disksize_gb | int > 10
 
     - name: Configure the image
       command: |

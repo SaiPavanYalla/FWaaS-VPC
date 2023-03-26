@@ -2,14 +2,23 @@
   hosts: localhost
   become: yes
   vars:
-    vm_name: "Guest-VM4"
-    vm_net: "L3"
+    namespace_tenant: T1
+    vm_name: "Guest-VM5"
+    vm_net_name: net1
+    vm_net: "{{ namespace_tenant }}_{{vm_net_name}}_BR"
+    src_dir: "/home/csc792/FwaaS-VPC"
 
   tasks:
     - name: push network template
       template:
-        src: /home/csc792/FwaaS-VPC/interface-template.xml.j2
-        dest: "/home/csc792/FwaaS-VPC/{{ vm_net}}.xml"
+        src: "{{ src_dir }}/interface-template.xml.j2"
+        dest: "{{ src_dir }}/{{ vm_name}}_{{ vm_net}}.xml"
+      register: template_result
 
     - name: attach network to VM
-      command: virsh attach-device {{ vm_name}} /home/csc792/FwaaS-VPC/{{ vm_net}}.xml --live --config
+      command: virsh attach-device {{ vm_name}} {{template_result.dest }} --live --config
+
+    - name: Remove xml file
+      file:
+        path: "{{ template_result.dest }}"
+        state: absent

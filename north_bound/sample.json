@@ -1,13 +1,13 @@
 {
-    "tenant_name":"tenant1",
-    "tenant_code": "abcd",
+    "tenant_name":"fsafsgafsa",
+    "tenant_code": "fsafsafa",
     "VMs": [
         {
             
-            "vm_name": "GuestVM1",
+            "vm_name": "GuestVM3",
             "vm_vcpus": "2",
             "vm_ram_mb": "2048",
-            "vm_disk_size" :"default", 
+            "vm_disk_size" :"10", 
             "connections": [
                 {
                     "Connected_to": ["net1" ,"net2"]
@@ -20,7 +20,7 @@
             "vm_name": "GuestVM2",
             "vm_vcpus": "2",
             "vm_ram_mb": "2048", 
-            "vm_disk_size" :"default",
+            "vm_disk_size" :"12",
             "connections": [
                 {
                     "Connected_to": ["net1","net2"]
@@ -39,7 +39,7 @@
             "mask" : "255.255.255.0",
             "connections": [
                 {
-                    "Connected_to": ["GuestVM1","GuestVM2" ]
+                    "Connected_to": ["GuestVM3","GuestVM2" ]
                     
                 }
             ]
@@ -51,7 +51,7 @@
             "mask" : "255.255.255.0",
             "connections": [
                 {
-                    "Connected_to": ["GuestVM1","GuestVM2"]   
+                    "Connected_to": ["GuestVM3","GuestVM2"]   
                 }
             ]
           

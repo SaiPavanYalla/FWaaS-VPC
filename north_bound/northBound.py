@@ -18,6 +18,10 @@ def validate_network_address(network_address, subnet_mask):
     except ValueError:
         return False
 
+with open('tenant_management.json', 'r') as file:
+    # Parse the JSON data
+    tenant_management_data = json.load(file)
+
 input_sample_json = "sample.json"
 
 # Open the file for reading
@@ -28,6 +32,22 @@ with open(input_sample_json, 'r') as f:
 tenant_name = tenant_data['tenant_name']
 tenant_code = tenant_data['tenant_code']
 
+flag_if_present = False
+namespace ="" 
+
+for key, value in tenant_management_data.items():
+        
+        if value["tenant_name"] == tenant_name:
+            flag_if_present = True
+            namespace = key
+            
+
+
+if flag_if_present == False:
+    print("Please enter Tenant details which are part of the VPC")
+    exit()
+
+tenant_data["namespace_tenant"] = namespace
 
 source_path = os.getcwd() + "/" + input_sample_json
 destination_path = os.getcwd() + "/" + tenant_name
@@ -108,13 +128,13 @@ if os.path.exists(network_destination_path + "/" + "network.json"):
         existing_data[tenant_name]= tenant_data
     
         with open(network_destination_path + "/" + "network.json", "w") as f1:
-            json.dump(existing_data, f1)
+            json.dump(existing_data, f1,indent=4)
 
 else:
     with open(network_destination_path + "/" + "network.json", "w") as f:
         tenant_json_data ={}
         tenant_json_data[tenant_name] = tenant_data
-        json.dump(tenant_json_data, f)
+        json.dump(tenant_json_data, f,indent=4)
 
 
 

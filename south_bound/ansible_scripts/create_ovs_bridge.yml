@@ -3,12 +3,7 @@
   hosts: localhost
   become: yes
   vars:
-    namespace_tenant: T1
-    vm_net_name: net1
     vm_net: "{{ namespace_tenant }}_{{vm_net_name}}"
-    tenant_net_gw_ip: 10.3.3.1/24
-    dhcp_start: 10.3.3.2
-    dhcp_end: 10.3.3.254
     dhcp_mask: 255.255.255.0
   tasks:
     - name: Create OVS bridge
