@@ -168,13 +168,13 @@ if existing_network_data:
         for network in existing_network_data[tenant_name]["Networks"]:
             existing_network_list.append(network["network_name"])
             if network["network_name"] in network_list:
-                print("The Network "+ network["network_name"] + "already exists in the Topology ")
+                print("The Network "+ network["network_name"] + " already exists in the Topology ")
                 exit()
 
         for vm in existing_network_data[tenant_name]["VMs"]:
             existing_vm_list.append(vm["vm_name"])
             if vm["vm_name"] in vm_list:
-                print("The VM "+ vm["vm_name"] + "already exists in the Topology ")
+                print("The VM "+ vm["vm_name"] + " already exists in the Topology ")
                 exit()
         
         
