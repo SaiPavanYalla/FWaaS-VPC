@@ -120,11 +120,12 @@ for tenant in  network_data:
     for vm in network_data[tenant]["VMs"]:
         if vm["status"] == "Completed":
             for connection in vm["connections"][0]["Connected_to"]:
+                if vm["connection_status"][connection] == "Ready": 
                 
-                for network in network_data[tenant]["Networks"]:
-                    if connection == network["network_name"]:
-                        if network["status"] == "Completed":
-                            if vm["connection_status"][connection] == "Ready": 
+                    for network in network_data[tenant]["Networks"]:
+                        if connection == network["network_name"]:
+                            if network["status"] == "Completed":
+                            
                                 namespace_tenant = network_data[tenant]["namespace_tenant"]
                                 hostname = vm["vm_name"]
                                 vm_net_name = connection

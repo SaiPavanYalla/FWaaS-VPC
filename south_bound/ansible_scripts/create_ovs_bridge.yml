@@ -39,10 +39,10 @@
         state: touch
 
 
-    - name: Create an empty dhcpd.conf file in Host
-      file:
-        path: "/etc/{{ vm_net }}.conf"
-        state: touch
+    # - name: Create an empty dhcpd.conf file in Host
+    #   file:
+    #     path: "/etc/{{ vm_net }}.conf"
+    #     state: touch
 
     - name: Add lines to DHCP file
       lineinfile:
