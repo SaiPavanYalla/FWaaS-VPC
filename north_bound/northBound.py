@@ -53,10 +53,15 @@ if flag_if_present == False:
 tenant_data["namespace_tenant"] = namespace
 
 source_path = os.getcwd() + "/" + input_sample_json
-destination_path = os.path.join(os.getcwd(), "tenantTopology",tenant_name,str(datetime.datetime.now()))
+destination_path = os.path.join(os.getcwd(),"tenantTopology",tenant_name,"inputTopology_" + str(datetime.datetime.now()) + ".json")
 
-if not os.path.exists(os.path.join(os.getcwd(), "tenantTopology"):
-    os.makedirs(os.path.join(os.getcwd(), "tenantTopology")
+#print(destination_path)
+
+if not os.path.exists(os.path.join(os.getcwd(), "tenantTopology")):
+    os.makedirs(os.path.join(os.getcwd(), "tenantTopology"))
+
+if not os.path.exists(os.path.join(os.getcwd(), "tenantTopology",tenant_name)):
+    os.makedirs(os.path.join(os.getcwd(), "tenantTopology",tenant_name))
 
 shutil.copy(source_path,destination_path )
 

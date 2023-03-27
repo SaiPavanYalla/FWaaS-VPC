@@ -5,6 +5,8 @@ import ipaddress
 import subprocess
 
 
+cwd = os.getcwd()
+
 inventory_path = os.path.join(cwd, "inventory.ini")
 
 playbook_path = os.path.join(cwd, "ansible_scripts","create_pgw.yml")

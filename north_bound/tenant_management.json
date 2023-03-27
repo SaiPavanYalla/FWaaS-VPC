@@ -1,73 +1,73 @@
 {
     "T1": {
         "status": "true",
-        "tenant_name": "sathvik",
+        "tenant_name": "team36",
         "tenant_code": "123456"
     },
     "T2": {
-        "status": "true",
-        "tenant_name": "tramu",
-        "tenant_code": "suuby"
+        "status": "false",
+        "tenant_name": "",
+        "tenant_code": ""
     },
     "T3": {
-        "status": "true",
-        "tenant_name": "sathvik",
-        "tenant_code": "123"
+        "status": "false",
+        "tenant_name": "",
+        "tenant_code": ""
     },
     "T4": {
-        "status": "true",
-        "tenant_name": "pavan",
-        "tenant_code": "12345"
+        "status": "false",
+        "tenant_name": "",
+        "tenant_code": ""
     },
     "T5": {
-        "status": "true",
-        "tenant_name": "romika",
-        "tenant_code": "12345"
+        "status": "false",
+        "tenant_name": "",
+        "tenant_code": ""
     },
     "T6": {
-        "status": "true",
-        "tenant_name": "ramesh",
-        "tenant_code": "12433"
+        "status": "false",
+        "tenant_name": "",
+        "tenant_code": ""
     },
     "T7": {
-        "status": "true",
-        "tenant_name": "suresh",
-        "tenant_code": "1234321"
+        "status": "false",
+        "tenant_name": "",
+        "tenant_code": ""
     },
     "T8": {
-        "status": "true",
-        "tenant_name": "akfkadb",
-        "tenant_code": "1234341"
+        "status": "false",
+        "tenant_name": "",
+        "tenant_code": ""
     },
     "T9": {
-        "status": "true",
-        "tenant_name": "ramuuuuu",
-        "tenant_code": "sfafa"
+        "status": "false",
+        "tenant_name": "",
+        "tenant_code": ""
     },
     "T10": {
-        "status": "true",
-        "tenant_name": "fakfbkabf",
-        "tenant_code": "safakhbfd"
+        "status": "false",
+        "tenant_name": "",
+        "tenant_code": ""
     },
     "T11": {
-        "status": "true",
-        "tenant_name": "fsafa",
-        "tenant_code": "sdaa"
+        "status": "false",
+        "tenant_name": "",
+        "tenant_code": ""
     },
     "T12": {
-        "status": "true",
-        "tenant_name": "fsafssfafga",
-        "tenant_code": "fsafa"
+        "status": "false",
+        "tenant_name": "",
+        "tenant_code": ""
     },
     "T13": {
-        "status": "true",
-        "tenant_name": "fsafsgafsa",
-        "tenant_code": "fsafsafa"
+        "status": "false",
+        "tenant_name": "",
+        "tenant_code": ""
     },
     "T14": {
-        "status": "true",
-        "tenant_name": "gfafasaf",
-        "tenant_code": "gfasfaaaaaaa"
+        "status": "false",
+        "tenant_name": "",
+        "tenant_code": ""
     },
     "T15": {
         "status": "false",
