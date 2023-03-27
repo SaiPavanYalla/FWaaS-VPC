@@ -2,7 +2,7 @@
   hosts: localhost
   become: yes
   vars:
-    vm_name: "{{ namespace_tenant }}_{{ hostname }}"
+    vm_name: "{{ namespace_tenant }}{{ hostname }}"
     vm_net: "{{ namespace_tenant }}_{{vm_net_name}}_BR"
     
 
