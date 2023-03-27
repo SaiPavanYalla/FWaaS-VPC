@@ -58,9 +58,6 @@
         - "dhcp-no-override"
         - "dhcp-authoritative"
         - "dhcp-lease-max=253"
-        - "dhcp-lease-time=12h"
-
-
 
     - name: run the DHCP file with dnsmasq
       command: "ip netns exec {{namespace_tenant}} dnsmasq -C /etc/netns/{{namespace_tenant}}/{{vm_net}}.conf"
