@@ -3,7 +3,7 @@
   hosts: localhost
   become: yes
   vars:
-    vm_name: "{{ namespace_tenant }}_{{ hostname }}" 
+    vm_name: "{{ namespace_tenant }}{{ hostname }}" 
     libvirt_pool_dir: "/var/lib/libvirt/images"
   tasks:
     - name: Install packages
