@@ -9,20 +9,22 @@
         "Networks" : [
 
          
-          {
-
-            "network_name": "net5",
-            "subnet": "192.168.19.0",
-            "mask" : "255.255.255.0"
-            
-          
-          }
+         
           
         ],
 
-       "firewall":{
+       "Firewall":{
+        "firewall_name": "VM4",
+        "firewall_vcpus": "2",
+        "firewall_ram_mb": "2048",
+        "firewall_disk_size": "10",
+        "firewall_internal_subnet": "172.16.0.0",
+        "firewall_external_subnet": "172.16.1.0"
+        
 
         
+       
+
 
        }   
 

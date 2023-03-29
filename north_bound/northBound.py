@@ -193,13 +193,26 @@ if existing_network_data:
         for vm in tenant_data["VMs"]:
             existing_network_data[tenant_name]["VMs"].append(vm)
 
+            
+        else:
+            existing_network_data[tenant_name]
 
     else:
         existing_network_data[tenant_name]= tenant_data
 else:
     existing_network_data[tenant_name]= tenant_data
 
-    
+
+
+if  "Firewall" in existing_network_data[tenant_name].keys():
+    print("Firewall is already present in the Network")
+    exit()
+else:
+    existing_network_data[tenant_name]["Firewall"]= tenant_data["Firewall"]
+    existing_network_data[tenant_name]["Firewall"]["status"] = {"firewall_status":"Ready","internal_net_status":"Ready","external_net_status":"Ready","internal_net_attach_status":"Ready","external_net_attach_status":"Ready"}
+
+
+
 with open(network_destination_path + "/" + "network.json", "w") as f1:
     json.dump(existing_network_data, f1,indent=4)
 
