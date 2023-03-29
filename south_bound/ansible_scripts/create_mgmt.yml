@@ -14,12 +14,16 @@
       openvswitch_bridge:
         bridge: "{{ vm_net }}"
         state: present
+        fail_mode: secure
 
     - name: Set OVS interface to UP
       command: "ip link set {{ vm_net }} up"
 
     - name: Set IP address to OVS bridge
       command: ip addr add {{ mgmt_gw }} dev {{ vm_net }}
+      
+    - name: Set IP address to OVS bridge
+      command: ovs-ofctl add-flow mgmt "table=0, priority=100, ip, nw_src=10.9.9.0/24, nw_dst=10.9.9.0/24, actions=output:NORMAL"
 
     - name: Create the DHCP file for mgmt
       become: true
