@@ -17,7 +17,9 @@ network_json_file_path  = os.path.join(parent_dir, "north_bound", "Network","net
 with open(network_json_file_path, 'r') as f:
     network_data = json.load(f)
 
-def create_network(network,network_data,i)
+
+def create_network(network,network_data,i):
+    inventory_path = os.path.join(cwd, "inventory.ini")
     playbook_path = os.path.join(cwd, "ansible_scripts","create_ovs_bridge.yml")
     if network["status"] == "Ready": 
         mask = network["mask"]
@@ -52,12 +54,80 @@ def create_network(network,network_data,i)
     return network_data
 
 
-inventory_path = os.path.join(cwd, "inventory.ini")
+def create_vm(vm,network_data,j):
+    inventory_path = os.path.join(cwd, "inventory.ini")
+    playbook_path = os.path.join(cwd, "ansible_scripts","create_vm.yml")
+    hostname =  vm["vm_name"]
+    namespace_tenant =  network_data[tenant]["namespace_tenant"]
+    vm_vcpus = vm["vm_vcpus"]
+    src_dir = os.path.join(cwd , "templates")
+    vm_ram_mb =  vm["vm_ram_mb"]
+    vm_disksize_gb = int(vm["vm_disk_size"])
 
+    extra_vars = {'hostname': hostname,'namespace_tenant' : namespace_tenant , 'vm_vcpus': vm_vcpus ,'src_dir': src_dir ,'vm_ram_mb': vm_ram_mb ,'vm_disksize_gb': vm_disksize_gb }
 
-#First step is to create networks
-for tenant in  network_data:
+    command = ['sudo','ansible-playbook', playbook_path ,'-i', inventory_path]
+    sudo_password = "mmrj2023"
+
+    for key, value in extra_vars.items():
+        if key == "vm_disksize_gb" or key == "vm_vcpus" or key == "vm_ram_mb" :
+            value = int(value)
+        command.extend(['-e', f'{key}={value}'])
+
     
+    network_data[tenant]["VMs"][j]["status"] = "Running"
+    process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
+    stdout, stderr = process.communicate(sudo_password.encode())
+
+    if process.returncode != 0:
+        output = stderr.decode('utf-8') if stderr else stdout.decode('utf-8')
+        network_data[tenant]["VMs"][j]["status"] = "Ready"
+        print(f"Ansible playbook failed with error while creating a VM :\n{output}")
+    else:
+        network_data[tenant]["VMs"][j]["status"] = "Completed"
+    return network_data
+
+
+def attach_interface(vm,network_data,k):
+    inventory_path = os.path.join(cwd, "inventory.ini")
+    playbook_path = os.path.join(cwd, "ansible_scripts","attach_ovs_bridge.yml")
+
+    namespace_tenant = network_data[tenant]["namespace_tenant"]
+    hostname = vm["vm_name"]
+    vm_net_name = connection
+    src_dir= os.path.join(cwd , "templates")
+    extra_vars = {'hostname': hostname  , 'namespace_tenant': namespace_tenant ,'src_dir': src_dir ,'vm_net_name': vm_net_name }
+
+    command = ['sudo','ansible-playbook', playbook_path ,'-i', inventory_path]
+    sudo_password = "mmrj2023"
+
+    for key, value in extra_vars.items():
+        command.extend(['-e', f'{key}={value}'])
+
+
+    network_data[tenant]["VMs"][k]["connection_status"][connection] = "Running"
+    
+
+    process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
+    stdout, stderr = process.communicate(sudo_password.encode())
+
+    if process.returncode != 0:
+        output = stderr.decode('utf-8') if stderr else stdout.decode('utf-8')
+        network_data[tenant]["VMs"][k]["connection_status"][connection] = "Ready"
+        
+        print(f"Ansible playbook failed with error while creating a VM :\n{output}")
+    else:
+        
+        network_data[tenant]["VMs"][k]["connection_status"][connection] = "Completed"
+
+
+
+
+
+
+
+for tenant in  network_data:
+    #create networks
     i=0
     for network in network_data[tenant]["Networks"]:
         network_data = create_vm(network,network_data,i)
@@ -65,15 +135,15 @@ for tenant in  network_data:
             
 
 
-    playbook_path = os.path.join(cwd, "ansible_scripts","create_vm.yml")
+    #create VMs
     j=0 
     for vm in network_data[tenant]["VMs"]:
         if vm["status"] == "Ready":
             network_data = create_vm(vm,network_data,j)
         j=j+1
 
+    #attach interface
     k=0
-    playbook_path = os.path.join(cwd, "ansible_scripts","attach_ovs_bridge.yml")
     for vm in network_data[tenant]["VMs"]:
         if vm["status"] == "Completed":
             for connection in vm["connections"][0]["Connected_to"]:
@@ -82,64 +152,10 @@ for tenant in  network_data:
                     for network in network_data[tenant]["Networks"]:
                         if connection == network["network_name"]:
                             if network["status"] == "Completed":
-                            
-                                namespace_tenant = network_data[tenant]["namespace_tenant"]
-                                hostname = vm["vm_name"]
-                                vm_net_name = connection
-                                src_dir= os.path.join(cwd , "templates")
-                                extra_vars = {'hostname': hostname  , 'namespace_tenant': namespace_tenant ,'src_dir': src_dir ,'vm_net_name': vm_net_name }
-
-                                command = ['sudo','ansible-playbook', playbook_path ,'-i', inventory_path]
-                                sudo_password = "mmrj2023"
-
-                                for key, value in extra_vars.items():
-                                    command.extend(['-e', f'{key}={value}'])
-
-
-                                network_data[tenant]["VMs"][k]["connection_status"][connection] = "Running"
-                                
-
-                                process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
-                                stdout, stderr = process.communicate(sudo_password.encode())
-
-                                if process.returncode != 0:
-                                    output = stderr.decode('utf-8') if stderr else stdout.decode('utf-8')
-                                    network_data[tenant]["VMs"][k]["connection_status"][connection] = "Ready"
-                                    
-                                    print(f"Ansible playbook failed with error while creating a VM :\n{output}")
-                                else:
-                                    
-                                    network_data[tenant]["VMs"][k]["connection_status"][connection] = "Completed"
-                                    
-                    
-
+                                attach_interface(vm,network_data,k)
         k=k+1
     
     #Creation of Firewall
-
-    playbook_path = os.path.join(cwd, "ansible_scripts","create_vm.yml")
-
-    extra_vars = {'namespace_tenant': namespace_tenant  , 'vm_net_name': vm_net_name ,'dhcp_start': dhcp_start ,'dhcp_end': dhcp_end ,'tenant_net_gw_ip': tenant_net_gw_ip }
-
-    command = ['sudo','ansible-playbook', playbook_path ,'-i', inventory_path]
-    sudo_password = "mmrj2023"
-
-    for key, value in extra_vars.items():
-        command.extend(['-e', f'{key}={value}'])
-
-    
-    network_data[tenant]["Networks"][i]["status"] = "Running"
-    process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
-    stdout, stderr = process.communicate(sudo_password.encode())
-
-    if process.returncode != 0:
-        output = stderr.decode('utf-8') if stderr else stdout.decode('utf-8')
-        network_data[tenant]["Networks"][i]["status"] = "Ready"
-        print(f"Ansible playbook failed with error while creating network:\n{output}")
-    else:
-        
-        network_data[tenant]["Networks"][i]["status"] = "Completed"
-
 
 
 
