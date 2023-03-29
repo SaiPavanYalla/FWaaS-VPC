@@ -17,7 +17,36 @@ network_json_file_path  = os.path.join(parent_dir, "north_bound", "Network","net
 with open(network_json_file_path, 'r') as f:
     network_data = json.load(f)
 
+def create_vm(vm,network_data,j):
+    hostname =  vm["vm_name"]
+    namespace_tenant =  network_data[tenant]["namespace_tenant"]
+    vm_vcpus = vm["vm_vcpus"]
+    src_dir = os.path.join(cwd , "templates")
+    vm_ram_mb =  vm["vm_ram_mb"]
+    vm_disksize_gb = int(vm["vm_disk_size"])
 
+    extra_vars = {'hostname': hostname,'namespace_tenant' : namespace_tenant , 'vm_vcpus': vm_vcpus ,'src_dir': src_dir ,'vm_ram_mb': vm_ram_mb ,'vm_disksize_gb': vm_disksize_gb }
+
+    command = ['sudo','ansible-playbook', playbook_path ,'-i', inventory_path]
+    sudo_password = "mmrj2023"
+
+    for key, value in extra_vars.items():
+        if key == "vm_disksize_gb" or key == "vm_vcpus" or key == "vm_ram_mb" :
+            value = int(value)
+        command.extend(['-e', f'{key}={value}'])
+
+    
+    network_data[tenant]["VMs"][j]["status"] = "Running"
+    process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
+    stdout, stderr = process.communicate(sudo_password.encode())
+
+    if process.returncode != 0:
+        output = stderr.decode('utf-8') if stderr else stdout.decode('utf-8')
+        network_data[tenant]["VMs"][j]["status"] = "Ready"
+        print(f"Ansible playbook failed with error while creating a VM :\n{output}")
+    else:
+        network_data[tenant]["VMs"][j]["status"] = "Completed"
+    return network_data
 
 
 inventory_path = os.path.join(cwd, "inventory.ini")
@@ -81,38 +110,7 @@ for tenant in  network_data:
     j=0 
     for vm in network_data[tenant]["VMs"]:
         if vm["status"] == "Ready":
-
-         
-            hostname =  vm["vm_name"]
-            namespace_tenant =  network_data[tenant]["namespace_tenant"]
-            vm_vcpus = vm["vm_vcpus"]
-            src_dir = os.path.join(cwd , "templates")
-            vm_ram_mb =  vm["vm_ram_mb"]
-            vm_disksize_gb = int(vm["vm_disk_size"])
-
-            extra_vars = {'hostname': hostname,'namespace_tenant' : namespace_tenant , 'vm_vcpus': vm_vcpus ,'src_dir': src_dir ,'vm_ram_mb': vm_ram_mb ,'vm_disksize_gb': vm_disksize_gb }
-
-            command = ['sudo','ansible-playbook', playbook_path ,'-i', inventory_path]
-            sudo_password = "mmrj2023"
-
-            for key, value in extra_vars.items():
-                if key == "vm_disksize_gb" or key == "vm_vcpus" or key == "vm_ram_mb" :
-                    value = int(value)
-                command.extend(['-e', f'{key}={value}'])
-
-            
-            network_data[tenant]["VMs"][j]["status"] = "Running"
-            process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
-            stdout, stderr = process.communicate(sudo_password.encode())
-
-            if process.returncode != 0:
-                output = stderr.decode('utf-8') if stderr else stdout.decode('utf-8')
-                network_data[tenant]["VMs"][j]["status"] = "Ready"
-                print(f"Ansible playbook failed with error while creating a VM :\n{output}")
-            else:
-                
-                network_data[tenant]["VMs"][j]["status"] = "Completed"
- 
+            network_data = create_vm(vm,network_data,j)
         j=j+1
 
     k=0
