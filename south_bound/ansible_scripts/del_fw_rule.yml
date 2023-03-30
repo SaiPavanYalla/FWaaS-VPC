@@ -13,4 +13,4 @@
         destination_port: "{{ dport }}"
 		    limit: "{{ threshold }}/second"
         jump: ACCEPT
-        state: present
+        state: absent
