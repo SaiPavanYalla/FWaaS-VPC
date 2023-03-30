@@ -69,9 +69,10 @@
         - "[FW]"
         - "{{ hosts}}"
         - "[FW:vars]"
-        - "username=mmrj"
-        - "password=mmrj"
+        - "ansible_user=mmrj"
+        - "ansible_password=mmrj"
         - "host_key_checking=False"
+        - "ssh_args = -o StrictHostKeyChecking=no"
 
       vars:
         hosts: |
