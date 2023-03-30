@@ -6,10 +6,10 @@
       iptables:
         chain: FORWARD
         table: filter
-        source: "{{ Src }}/24"
-        destination: "{{ dst }}"
+        source: "{{ src_ip }}/24"
+        destination: "{{ dest_ip }}"
         protocol: "{{ protocol }}"
-        source_port: "{{ sport }}"
-        destination_port: "{{ dport }}"
+        source_port: "{{ src_port }}"
+        destination_port: "{{ dest_port }}"
 		limit: "{{ threshold }}/second"
         jump: ACCEPT
