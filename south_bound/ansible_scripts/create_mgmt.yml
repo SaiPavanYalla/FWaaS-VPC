@@ -4,7 +4,7 @@
   become: yes
   vars:
     vm_net: "mgmt"
-    mgmt_gw: 10.9.9.254
+    mgmt_gw: 10.9.9.254/24
     dhcp_start: 10.9.9.1
     dhcp_end: 10.9.9.253
     dhcp_mask: 255.255.255.0
@@ -30,11 +30,6 @@
       file:
         path: "/etc/{{ vm_net }}.conf"
         state: touch
-
-    # - name: Create an empty dhcpd.conf file in Host
-    #   file:
-    #     path: "/etc/{{ vm_net }}.conf"
-    #     state: touch
 
     - name: Add lines to DHCP file
       lineinfile:
