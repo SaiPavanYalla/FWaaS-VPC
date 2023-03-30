@@ -1,4 +1,2 @@
-Source IP,Age,City
-John,25,New York
-Alice,30,San Francisco
-Bob,20,Chicago
+src_ip, src_port, dest_ip, dest_port,protocol, threshold
+192.168.1.0/24, any, 192.168.2.0/24, 22,tcp, 15 

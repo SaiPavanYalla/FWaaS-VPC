@@ -1,13 +1,6 @@
 - name: Configure iptables rule on FW
-  hosts: localhost
-  become: true
-  vars:
-    Src: "192.168.1.0"
-    dst: "8.8.8.8"
-    sport: "80"
-    dport: "443"
-    protocol: "tcp"
-	threshold: "
+  hosts: "{{host}}"
+  become: true    
   tasks:
     - name: Add iptables rule for FORWARD chain
       iptables:
@@ -16,7 +9,7 @@
         source: "{{ Src }}/24"
         destination: "{{ dst }}"
         protocol: "{{ protocol }}"
-        sport: "{{ sport }}"
-        dport: "{{ dport }}"
+        source_port: "{{ sport }}"
+        destination_port: "{{ dport }}"
 		limit: "{{ threshold }}/second"
         jump: ACCEPT
