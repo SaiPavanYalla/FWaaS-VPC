@@ -58,20 +58,21 @@
     - name: Create the FW inventory file
       become: true
       file:
-        path: "{{ src_dir_FW }}/FW.ini"
+        path: "{{ src_dir_FW }}/firewall.ini"
         state: touch
 
     - name: Add lines to file
       lineinfile:
-        path: "{{ src_dir_FW }}/FW.ini"
+        path: "{{ src_dir_FW }}/firewall.ini"
         line: "{{ item }}"
       with_items:
         - "[FW]"
         - "{{ hosts}}"
         - "[FW:vars]"
-        - "username: mmrj"
-        - "password: mmrj"
-        - "host_key_checking: False"
+        - "ansible_user=mmrj"
+        - "ansible_password=mmrj"
+        - "host_key_checking=False"
+        - "ssh_args = -o StrictHostKeyChecking=no"
 
       vars:
         hosts: |
