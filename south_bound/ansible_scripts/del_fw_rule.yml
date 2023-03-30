@@ -1,0 +1,16 @@
+- name: Configure iptables rule on FW
+  hosts: "{{host}}"
+  become: true    
+  tasks:
+    - name: Add iptables rule for FORWARD chain
+      iptables:
+        chain: FORWARD
+        table: filter
+        source: "{{ Src }}/24"
+        destination: "{{ dst }}"
+        protocol: "{{ protocol }}"
+        source_port: "{{ sport }}"
+        destination_port: "{{ dport }}"
+		    limit: "{{ threshold }}/second"
+        jump: ACCEPT
+        state: absent
