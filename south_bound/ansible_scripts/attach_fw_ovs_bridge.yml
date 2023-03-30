@@ -9,7 +9,7 @@
   tasks:
     - name: push network template
       template:
-        src: "{{ src_dir }}/interface-template.xml.j2"
+        src: "{{ src_dir }}/fw-interface-template.xml.j2"
         dest: "{{ src_dir }}/{{ vm_name}}_{{ vm_net}}.xml"
       register: template_result
 
