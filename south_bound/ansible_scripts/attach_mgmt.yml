@@ -1,0 +1,21 @@
+- name: Create and configure OVS bridge
+  hosts: localhost
+  become: yes
+  vars:
+    vm_net: "mgmt"
+    namespace_ID: "{{ last_mac }}"
+
+  tasks:
+    - name: push network template
+      template:
+        src: "{{ src_dir }}/mgmtinterface.xml.j2"
+        dest: "{{ src_dir }}/{{ vm_name}}_{{ vm_net}}.xml"
+      register: template_result
+
+    - name: attach network to VM
+      command: virsh attach-device {{ vm_name}} {{template_result.dest }} --live --config
+
+    - name: Remove xml file
+      file:
+        path: "{{ template_result.dest }}"
+        state: absent

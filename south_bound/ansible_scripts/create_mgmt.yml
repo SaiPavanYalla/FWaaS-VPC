@@ -1,0 +1,85 @@
+---
+- name: Create and configure OVS MGMT bridge
+  hosts: localhost
+  become: yes
+  vars:
+    vm_net: "mgmt"
+    mgmt_gw: 10.9.9.254
+    dhcp_start: 10.9.9.1
+    dhcp_end: 10.9.9.253
+    dhcp_mask: 255.255.255.0
+    src_dir_FW: "/home/csc792/github/FWaaS-VPC/south_bound"
+  tasks:
+    - name: Create OVS bridge
+      openvswitch_bridge:
+        bridge: "{{ vm_net }}"
+        state: present
+        fail_mode: secure
+
+    - name: Set OVS interface to UP
+      command: "ip link set {{ vm_net }} up"
+
+    - name: Set IP address to OVS bridge
+      command: ip addr add {{ mgmt_gw }} dev {{ vm_net }}
+      
+    - name: Set IP address to OVS bridge
+      command: ovs-ofctl add-flow mgmt "table=0, priority=100, ip, nw_src=10.9.9.0/24, nw_dst=10.9.9.0/24, actions=output:NORMAL"
+
+    - name: Create the DHCP file for mgmt
+      become: true
+      file:
+        path: "/etc/{{ vm_net }}.conf"
+        state: touch
+
+    # - name: Create an empty dhcpd.conf file in Host
+    #   file:
+    #     path: "/etc/{{ vm_net }}.conf"
+    #     state: touch
+
+    - name: Add lines to DHCP file
+      lineinfile:
+        path: "/etc/{{ vm_net }}.conf"
+        line: "{{ item }}"
+      with_items:
+        - "strict-order"
+        - "user=libvirt-dnsmasq"
+        - "except-interface=lo"
+        - "bind-dynamic"
+        - "interface={{ vm_net }}"
+        - "dhcp-range={{dhcp_start}},{{dhcp_end}},{{dhcp_mask}}"
+        - "dhcp-no-override"
+        - "dhcp-authoritative"
+        - "dhcp-lease-max=253"
+        - "{{ dhcp_hosts }}"
+      vars:
+        dhcp_hosts: |
+          {% for i in range(1, 253) %}
+          dhcp-host=52:54:00:10:09:{{ '%02x' % i }},10.9.9.{{ i }}
+          {% endfor %}     
+
+    - name: run the DHCP file with dnsmasq
+      command: "dnsmasq -C /etc/{{ vm_net }}.conf"
+    
+    - name: Create the FW inventory file
+      become: true
+      file:
+        path: "{{ src_dir_FW }}/FW.ini"
+        state: touch
+
+    - name: Add lines to file
+      lineinfile:
+        path: "{{ src_dir_FW }}/FW.ini"
+        line: "{{ item }}"
+      with_items:
+        - "[FW]"
+        - "{{ hosts}}"
+        - "[FW:vars]"
+        - "username: mmrj"
+        - "password: mmrj"
+        - "host_key_checking: False"
+
+      vars:
+        hosts: |
+          {% for i in range(1, 254) %}
+          T{{ i }}FW ansible_host=10.9.9.{{ i }}
+          {% endfor %}
