@@ -61,18 +61,20 @@ else:
         exit()
 
 
-def execute_firewall_policy(firewall_policy):
+def execute_firewall_policy(add_firewall_policy):
     
     parent_dir = os.path.dirname(os.getcwd())
 
     inventory_path = os.path.join(parent_dir,"south_bound", "inventory.ini")
     playbook_path = os.path.join(parent_dir,"south_bound", "ansible_scripts","add_fw_rule.yml")
-    firewall_policy["host"] = network_data[tenant_name]["namespace_tenant"] + "FW"        
+    add_firewall_policy["host"] = network_data[tenant_name]["namespace_tenant"] + "FW"        
     command = ['sudo','ansible-playbook', playbook_path ,'-i', inventory_path,"--ask-become-pass"]
     sudo_password = "mmrj2023"
-    firewall_policy["src_port"] = ""
-    for key, value in firewall_policy.items():
+    
+    for key, value in add_firewall_policy.items():
         command.extend(['-e', f'{key}={value}'])
+
+    add_firewall_policy.pop("host",None)
 
     status = "Ready"
     process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
@@ -81,7 +83,7 @@ def execute_firewall_policy(firewall_policy):
         output = stderr.decode('utf-8') if stderr else stdout.decode('utf-8')
         status = "Ready"
         print(f"Ansible playbook failed with error while adding a Policy :\n{output}")
-        print(firewall_policy)
+        print(add_firewall_policy)
     else:
         status = "Completed"
         
@@ -89,18 +91,20 @@ def execute_firewall_policy(firewall_policy):
     return status
 
 
-def delete_firewall_policy(firewall_policy):
+def delete_firewall_policy(del_firewall_policy):
     
     parent_dir = os.path.dirname(os.getcwd())
 
     inventory_path = os.path.join(parent_dir,"south_bound", "inventory.ini")
     playbook_path = os.path.join(parent_dir,"south_bound", "ansible_scripts","del_fw_rule.yml")
-    firewall_policy["host"] = network_data[tenant_name]["namespace_tenant"] + "FW"        
+    del_firewall_policy["host"] = network_data[tenant_name]["namespace_tenant"] + "FW"        
     command = ['sudo','ansible-playbook', playbook_path ,'-i', inventory_path,"--ask-become-pass"]
     sudo_password = "mmrj2023"
 
-    for key, value in firewall_policy.items():
+    for key, value in del_firewall_policy.items():
         command.extend(['-e', f'{key}={value}'])
+    
+    del_firewall_policy.pop("host",None)
 
     status = "Deleted"
     process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
@@ -109,7 +113,7 @@ def delete_firewall_policy(firewall_policy):
         output = stderr.decode('utf-8') if stderr else stdout.decode('utf-8')
         status = "Delete"
         print(f"Ansible playbook failed with error while deleting a Policy :\n{output}")
-        print(firewall_policy)
+        print(del_firewall_policy)
     else:
         status = "Deleted"
         
@@ -179,6 +183,7 @@ network_data[tenant_name]["Firewall"]["Policies"] = existing_firewall_policies
 i=0
 for existing_firewall_policy in existing_firewall_policies:
     flag_NA = True
+    
     for firewall_policy in firewall_policy_list:
         if are_dicts_equal_except_key(firewall_policy,existing_firewall_policy,"status"):
             flag_NA = False
@@ -191,6 +196,9 @@ for existing_firewall_policy in existing_firewall_policies:
                 existing_firewall_policies.remove(existing_firewall_policy)
             else:
                 existing_firewall_policies[i]["status"] = "Delete"
+
+        if existing_firewall_policy["status"] == "Ready":
+            existing_firewall_policies.remove(existing_firewall_policy)
     i+=1
             
 
@@ -210,11 +218,16 @@ for firewall_policy in firewall_policy_list:
                 existing_firewall_policies[i]["status"] = status
         i+=1
     
-    flag = True
+    flag_NA = True
+    
     for existing_firewall_policy in existing_firewall_policies:
         if are_dicts_equal_except_key(firewall_policy,existing_firewall_policy,"status"):
-            flag = False
-    if flag:
+            flag_NA = False
+    if flag_NA:
+        # print("in here")
+        # print(flag_NA)
+        # print(existing_firewall_policies)
+        # print(firewall_policy)
         status = execute_firewall_policy(firewall_policy)
         firewall_policy["status"] = status 
         existing_firewall_policies.append(firewall_policy)

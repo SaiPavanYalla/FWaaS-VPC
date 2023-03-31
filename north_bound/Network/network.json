@@ -109,25 +109,13 @@
             "Policies": [
                 {
                     "src_ip": "192.168.1.0/24",
-                    "src_port": "",
+                    "src_port": "23",
                     "dest_ip": "192.168.2.0/24",
                     "dest_port": "22",
                     "protocol": "tcp",
                     "policy_action": "ACCEPT",
                     "threshold": "15",
-                    "host": "T1FW",
-                    "status": "Ready"
-                },
-                {
-                    "src_ip": "192.168.1.0/24",
-                    "src_port": "",
-                    "dest_ip": "192.168.2.0/24",
-                    "dest_port": "22",
-                    "protocol": "tcp",
-                    "policy_action": "ACCEPT",
-                    "threshold": "15",
-                    "host": "T1FW",
-                    "status": "Ready"
+                    "status": "Completed"
                 }
             ]
         }

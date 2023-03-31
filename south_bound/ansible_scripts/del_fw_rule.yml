@@ -12,5 +12,5 @@
         source_port: "{{ src_port }}"
         destination_port: "{{ dest_port }}"
         limit: "{{ threshold }}/second"
-        jump: "{{action}}"
+        jump: "{{policy_action}}"
         state: absent
