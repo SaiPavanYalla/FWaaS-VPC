@@ -1,5 +1,9 @@
 import csv
 import ipaddress
+import os 
+import json
+import subprocess
+
 
 def is_valid_ipv4_address(address):
     try:
@@ -11,10 +15,11 @@ def is_valid_ipv4_address(address):
 
 def is_valid_port(port):
     try:
+        if str(port) == "any":
+            return True
+        
         port = int(port)
         if port >= 1 and port <= 65535:
-            return True
-        if str(port) == "any":
             return True
         else:
             return False
@@ -32,8 +37,11 @@ def are_dicts_equal_except_key(d1, d2, key):
 
 firewall_policy_list = []
 
-tenant_name = input("Please enter your Tenant Name")
-tenant_code = input("Please enter your Tenant Code")
+tenant_name =  "team36"
+tenant_code = "123456"
+
+#tenant_name = input("Please enter your Tenant Name: ") 
+#tenant_code = input("Please enter your Tenant Code: ") 
 
 
 network_data = {}
@@ -45,7 +53,7 @@ if not tenant_name in network_data.keys():
     print("Tenant Network is not created. Please create Tenant Network")
     exit()
 else:
-    if not tenant_code == network_data[tenant_name]["tenant_code"] 
+    if not tenant_code == network_data[tenant_name]["tenant_code"] :
         print("Please type the correct Tenant Code")
         exit()
     if not ( "Firewall" in network_data[tenant_name].keys() and all(val == "Completed" for val in network_data[tenant_name]["Firewall"]["status"].values())) :
@@ -55,14 +63,14 @@ else:
 
 def execute_firewall_policy(firewall_policy):
     
-    parent_dir = os.path.dirname(cwd)
+    parent_dir = os.path.dirname(os.getcwd())
 
     inventory_path = os.path.join(parent_dir,"south_bound", "inventory.ini")
     playbook_path = os.path.join(parent_dir,"south_bound", "ansible_scripts","add_fw_rule.yml")
-    firewall_policy["host"] = network_data[tenant]["namespace_tenant"] + "FW"        
-    command = ['sudo','ansible-playbook', playbook_path ,'-i', inventory_path]
+    firewall_policy["host"] = network_data[tenant_name]["namespace_tenant"] + "FW"        
+    command = ['sudo','ansible-playbook', playbook_path ,'-i', inventory_path,"--ask-become-pass"]
     sudo_password = "mmrj2023"
-
+    firewall_policy["src_port"] = ""
     for key, value in firewall_policy.items():
         command.extend(['-e', f'{key}={value}'])
 
@@ -73,7 +81,7 @@ def execute_firewall_policy(firewall_policy):
         output = stderr.decode('utf-8') if stderr else stdout.decode('utf-8')
         status = "Ready"
         print(f"Ansible playbook failed with error while adding a Policy :\n{output}")
-        print(policy_obj)
+        print(firewall_policy)
     else:
         status = "Completed"
         
@@ -83,12 +91,12 @@ def execute_firewall_policy(firewall_policy):
 
 def delete_firewall_policy(firewall_policy):
     
-    parent_dir = os.path.dirname(cwd)
+    parent_dir = os.path.dirname(os.getcwd())
 
     inventory_path = os.path.join(parent_dir,"south_bound", "inventory.ini")
     playbook_path = os.path.join(parent_dir,"south_bound", "ansible_scripts","del_fw_rule.yml")
-    firewall_policy["host"] = network_data[tenant]["namespace_tenant"] + "FW"        
-    command = ['sudo','ansible-playbook', playbook_path ,'-i', inventory_path]
+    firewall_policy["host"] = network_data[tenant_name]["namespace_tenant"] + "FW"        
+    command = ['sudo','ansible-playbook', playbook_path ,'-i', inventory_path,"--ask-become-pass"]
     sudo_password = "mmrj2023"
 
     for key, value in firewall_policy.items():
@@ -101,7 +109,7 @@ def delete_firewall_policy(firewall_policy):
         output = stderr.decode('utf-8') if stderr else stdout.decode('utf-8')
         status = "Delete"
         print(f"Ansible playbook failed with error while deleting a Policy :\n{output}")
-        print(policy_obj)
+        print(firewall_policy)
     else:
         status = "Deleted"
         
@@ -129,8 +137,20 @@ with open('firewallPolicies.csv', 'r') as file:
             print("The Port Numbers given are not valid in the row below")
             print(firewall_policy_obj)
             exit()
+        else:
+            if firewall_policy_obj["src_port"] == "any":
+                firewall_policy_obj["src_port"] = "0-65535"
+
+            if firewall_policy_obj["dest_port"] == "any":
+                firewall_policy_obj["dest_port"] = "0-65535"
+
+
+        if not (firewall_policy_obj["policy_action"] == "ACCEPT" or firewall_policy_obj["policy_action"] == "DROP" ):
+            print("The Policy action is not valid it should be ACCEPT or DROP")
+            print(firewall_policy_obj)
+            exit()
     
-        firewall_policy_list.append(row)
+        firewall_policy_list.append(firewall_policy_obj)
 
 
 existing_firewall_policies = []
@@ -144,33 +164,34 @@ for existing_firewall_policy in existing_firewall_policies:
 
     if existing_firewall_policy["status"] == "Delete":
         status = delete_firewall_policy(existing_firewall_policy)
-        if status = "Deleted":
+        if status == "Deleted":
             existing_firewall_policies.remove(existing_firewall_policy)
         
 
 network_data[tenant_name]["Firewall"]["Policies"] = existing_firewall_policies
 
 
+
 #Deleting firewall policies which are not in the requirement file
 
-if "Policies" in network_data[tenant_name]["Firewall"].keys():
-    existing_firewall_policies = network_data[tenant_name]["Firewall"]["Policies"]
-    i=0
-    for existing_firewall_policy in existing_firewall_policies:
-        flag_NA = True
-        for firewall_policy in firewall_policy_list:
-            if are_dicts_equal_except_key(firewall_policy,existing_firewall_policy,"status"):
-                flag_NA = False
+
+    
+i=0
+for existing_firewall_policy in existing_firewall_policies:
+    flag_NA = True
+    for firewall_policy in firewall_policy_list:
+        if are_dicts_equal_except_key(firewall_policy,existing_firewall_policy,"status"):
+            flag_NA = False
+    
+    if flag_NA:
         
-        if flag_NA:
-            
-            if existing_firewall_policy["status"] == "Completed":
-                status = delete_firewall_policy(existing_firewall_policy)
-                if status = "Deleted":
-                    existing_firewall_policies.remove(existing_firewall_policy)
-                else:
-                    existing_firewall_policies[i]["status"] = "Delete"
-        i+=1
+        if existing_firewall_policy["status"] == "Completed":
+            status = delete_firewall_policy(existing_firewall_policy)
+            if status == "Deleted":
+                existing_firewall_policies.remove(existing_firewall_policy)
+            else:
+                existing_firewall_policies[i]["status"] = "Delete"
+    i+=1
             
 
 network_data[tenant_name]["Firewall"]["Policies"] = existing_firewall_policies

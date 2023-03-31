@@ -11,6 +11,6 @@
         protocol: "{{ protocol }}"
         source_port: "{{ src_port }}"
         destination_port: "{{ dest_port }}"
-		    limit: "{{ threshold }}/second"
-        jump: "{{action}}"
+        limit: "{{ threshold }}/second"
+        jump: "{{policy_action}}"
         state: present

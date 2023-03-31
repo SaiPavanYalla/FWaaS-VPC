@@ -105,7 +105,31 @@
                 "internal_net_attach_status": "Completed",
                 "external_net_attach_status": "Completed",
                 "mgmt_net_attach_status": "Completed"
-            }
+            },
+            "Policies": [
+                {
+                    "src_ip": "192.168.1.0/24",
+                    "src_port": "",
+                    "dest_ip": "192.168.2.0/24",
+                    "dest_port": "22",
+                    "protocol": "tcp",
+                    "policy_action": "ACCEPT",
+                    "threshold": "15",
+                    "host": "T1FW",
+                    "status": "Ready"
+                },
+                {
+                    "src_ip": "192.168.1.0/24",
+                    "src_port": "",
+                    "dest_ip": "192.168.2.0/24",
+                    "dest_port": "22",
+                    "protocol": "tcp",
+                    "policy_action": "ACCEPT",
+                    "threshold": "15",
+                    "host": "T1FW",
+                    "status": "Ready"
+                }
+            ]
         }
     }
 }

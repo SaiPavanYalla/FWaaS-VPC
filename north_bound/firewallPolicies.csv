@@ -1,2 +1,2 @@
-src_ip, src_port, dest_ip, dest_port,protocol,action,threshold
-192.168.1.0/24, any, 192.168.2.0/24, 22,tcp,accept,15 
+src_ip,src_port,dest_ip,dest_port,protocol,policy_action,threshold
+192.168.1.0/24,22,192.168.2.0/24,22,tcp,ACCEPT,15
