@@ -1,0 +1,111 @@
+{
+    "team36": {
+        "tenant_name": "team36",
+        "tenant_code": "123456",
+        "VMs": [
+            {
+                "vm_name": "VM3",
+                "vm_vcpus": "2",
+                "vm_ram_mb": "2048",
+                "vm_disk_size": "10",
+                "connections": [
+                    {
+                        "Connected_to": [
+                            "net1",
+                            "net2",
+                            "net5"
+                        ]
+                    }
+                ],
+                "status": "Completed",
+                "connection_status": {
+                    "net1": "Completed",
+                    "net2": "Completed",
+                    "net5": "Completed"
+                }
+            },
+            {
+                "vm_name": "VM4",
+                "vm_vcpus": "2",
+                "vm_ram_mb": "2048",
+                "vm_disk_size": "10",
+                "connections": [
+                    {
+                        "Connected_to": [
+                            "net4",
+                            "net5"
+                        ]
+                    }
+                ],
+                "status": "Completed",
+                "connection_status": {
+                    "net4": "Completed",
+                    "net5": "Completed"
+                }
+            },
+            {
+                "vm_name": "VM5",
+                "vm_vcpus": "2",
+                "vm_ram_mb": "2048",
+                "vm_disk_size": "10",
+                "connections": [
+                    {
+                        "Connected_to": [
+                            "net1",
+                            "net2",
+                            "net4"
+                        ]
+                    }
+                ],
+                "status": "Completed",
+                "connection_status": {
+                    "net1": "Completed",
+                    "net2": "Completed",
+                    "net4": "Completed"
+                }
+            }
+        ],
+        "Networks": [
+            {
+                "network_name": "net1",
+                "subnet": "192.168.11.0",
+                "mask": "255.255.255.0",
+                "status": "Completed"
+            },
+            {
+                "network_name": "net2",
+                "subnet": "192.168.12.0",
+                "mask": "255.255.255.0",
+                "status": "Completed"
+            },
+            {
+                "network_name": "net4",
+                "subnet": "192.168.17.0",
+                "mask": "255.255.255.0",
+                "status": "Completed"
+            },
+            {
+                "network_name": "net5",
+                "subnet": "192.168.19.0",
+                "mask": "255.255.255.0",
+                "status": "Completed"
+            }
+        ],
+        "namespace_tenant": "T1",
+        "Firewall": {
+            "firewall_vcpus": "2",
+            "firewall_ram_mb": "2048",
+            "firewall_disk_size": "10",
+            "firewall_internal_subnet": "172.16.0.0",
+            "firewall_external_subnet": "172.16.1.0",
+            "status": {
+                "firewall_status": "Completed",
+                "internal_net_status": "Completed",
+                "external_net_status": "Completed",
+                "internal_net_attach_status": "Completed",
+                "external_net_attach_status": "Completed",
+                "mgmt_net_attach_status": "Completed"
+            }
+        }
+    }
+}
