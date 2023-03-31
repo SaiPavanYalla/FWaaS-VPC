@@ -3,9 +3,8 @@ import ipaddress
 
 def is_valid_ipv4_address(address):
     try:
-        # Try to create an IPv4Address object
-        ipaddress.IPv4Address(address)
-        return True
+        ip_network = ipaddress.IPv4Network(address)
+        return (ip_network.is_private and not ip_network.is_multicast)
     except ipaddress.AddressValueError:
         # The address is not a valid IPv4 address
         return False
@@ -58,7 +57,7 @@ def execute_firewall_policy(firewall_policy):
     
     parent_dir = os.path.dirname(cwd)
 
-    inventory_path = os.path.join(parent_dir,"south_bound", "firewall.ini")
+    inventory_path = os.path.join(parent_dir,"south_bound", "inventory.ini")
     playbook_path = os.path.join(parent_dir,"south_bound", "ansible_scripts","add_fw_rule.yml")
     firewall_policy["host"] = network_data[tenant]["namespace_tenant"] + "FW"        
     command = ['sudo','ansible-playbook', playbook_path ,'-i', inventory_path]
@@ -86,7 +85,7 @@ def delete_firewall_policy(firewall_policy):
     
     parent_dir = os.path.dirname(cwd)
 
-    inventory_path = os.path.join(parent_dir,"south_bound", "firewall.ini")
+    inventory_path = os.path.join(parent_dir,"south_bound", "inventory.ini")
     playbook_path = os.path.join(parent_dir,"south_bound", "ansible_scripts","del_fw_rule.yml")
     firewall_policy["host"] = network_data[tenant]["namespace_tenant"] + "FW"        
     command = ['sudo','ansible-playbook', playbook_path ,'-i', inventory_path]

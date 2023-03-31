@@ -8,7 +8,6 @@
     dhcp_start: 10.9.9.1
     dhcp_end: 10.9.9.253
     dhcp_mask: 255.255.255.0
-    src_dir_FW: "/home/csc792/github/FWaaS-VPC/south_bound"
   tasks:
     - name: Create OVS bridge
       openvswitch_bridge:
@@ -55,15 +54,11 @@
     - name: run the DHCP file with dnsmasq
       command: "dnsmasq -C /etc/{{ vm_net }}.conf"
     
-    - name: Create the FW inventory file
-      become: true
-      file:
-        path: "{{ src_dir_FW }}/firewall.ini"
-        state: touch
+    
 
     - name: Add lines to file
       lineinfile:
-        path: "{{ src_dir_FW }}/firewall.ini"
+        path: "{{ src_dir_FW }}/inventory.ini"
         line: "{{ item }}"
       with_items:
         - "[FW]"

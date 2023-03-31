@@ -209,7 +209,7 @@ if  "Firewall" in existing_network_data[tenant_name].keys():
     exit()
 else:
     existing_network_data[tenant_name]["Firewall"]= tenant_data["Firewall"]
-    existing_network_data[tenant_name]["Firewall"]["status"] = {"firewall_status":"Ready","internal_net_status":"Ready","external_net_status":"Ready","internal_net_attach_status":"Ready","external_net_attach_status":"Ready","management_net_attach_status":"Ready"}
+    existing_network_data[tenant_name]["Firewall"]["status"] = {"firewall_status":"Ready","internal_net_status":"Ready","external_net_status":"Ready","internal_net_attach_status":"Ready","external_net_attach_status":"Ready","mgmt_net_attach_status":"Ready"}
 
 
 

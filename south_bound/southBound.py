@@ -11,7 +11,7 @@ cwd = os.getcwd()
 parent_dir = os.path.dirname(cwd)
 
 # Navigate to the Network directory
-network_json_file_path  = os.path.join(parent_dir, "south_bound", "Network","network.json")
+network_json_file_path  = os.path.join(parent_dir, "north_bound", "Network","network.json")
 
 # Open the file for reading
 with open(network_json_file_path, 'r') as f:
@@ -326,8 +326,13 @@ for tenant in  network_data:
             else:
                 firewall_data["status"]["external_net_attach_status"] = "Completed"
 
+       
+
+
+
+
         #attach management to firewall
-        if  firewall_data["status"]["management_net_attach_status"] == "Ready" and firewall_data["status"]["firewall_status"] == "Completed" :
+        if  firewall_data["status"]["mgmt_net_attach_status"] == "Ready" and firewall_data["status"]["firewall_status"] == "Completed" :
             inventory_path = os.path.join(cwd, "inventory.ini")
             playbook_path = os.path.join(cwd, "ansible_scripts","attach_mgmt.yml")
            
@@ -344,7 +349,7 @@ for tenant in  network_data:
                 command.extend(['-e', f'{key}={value}'])
 
 
-            firewall_data["status"]["management_net_attach_status"] = "Running"
+            firewall_data["status"]["mgmt_net_attach_status"] = "Running"
             
 
             process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
@@ -352,11 +357,11 @@ for tenant in  network_data:
 
             if process.returncode != 0:
                 output = stderr.decode('utf-8') if stderr else stdout.decode('utf-8')
-                firewall_data["status"]["management_net_attach_status"] = "Ready"
+                firewall_data["status"]["mgmt_net_attach_status"] = "Ready"
                 
                 print(f"Ansible playbook failed with error while creating a management network attach :\n{output}")
             else:
-                firewall_data["status"]["management_net_attach_status"] = "Completed"
+                firewall_data["status"]["mgmt_net_attach_status"] = "Completed"
 
 
 
