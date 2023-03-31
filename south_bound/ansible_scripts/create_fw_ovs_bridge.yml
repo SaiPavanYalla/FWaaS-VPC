@@ -1,0 +1,62 @@
+---
+- name: Create and configure OVS bridge
+  hosts: localhost
+  become: yes
+  vars:
+    vm_net: "{{ namespace_tenant }}_{{vm_net_name}}"
+    dhcp_mask: 255.255.255.0
+  tasks:
+    - name: Create OVS bridge
+      openvswitch_bridge:
+        bridge: "{{ vm_net }}_BR"
+        state: present
+
+    - name: Set OVS interface to UP
+      command: "ip link set {{ vm_net }}_BR up"
+
+    - name: Create veth pair
+      command: ip link add {{ vm_net }}_veth1 type veth peer name {{ vm_net }}_veth0
+
+    - name: Move veth peer to Namespace
+      command: ip link set {{ vm_net }}_veth0 netns {{ namespace_tenant }}
+
+    - name: Move veth_pgw to OVS PGW Bridge
+      command: ovs-vsctl add-port {{ vm_net }}_BR  {{ vm_net }}_veth1
+
+    - name: Bring up veth peer
+      command: ip link set dev {{ vm_net }}_veth1 up
+
+    - name: Bring up veth_t
+      command: ip netns exec {{ namespace_tenant }} ip link set dev {{ vm_net }}_veth0 up
+
+    - name: Assign IP address
+      command: ip netns exec {{ namespace_tenant }} ip addr add {{ tenant_net_gw_ip }} dev {{ vm_net }}_veth0
+
+    - name: Create the DHCP file in Namespace
+      become: true
+      file:
+        path: "/etc/netns/{{ namespace_tenant }}/{{ vm_net }}.conf"
+        state: touch
+
+    
+    - name: Add lines to DHCP file
+      lineinfile:
+        path: "/etc/netns/{{ namespace_tenant }}/{{ vm_net }}.conf"
+        line: "{{ item }}"
+      with_items:
+        - "strict-order"
+        - "user=libvirt-dnsmasq"
+        - "except-interface=lo"
+        - "bind-dynamic"
+        - "interface={{ vm_net }}_veth0"
+        - "dhcp-range={{dhcp_start}},{{dhcp_end}},{{dhcp_mask}}"
+        - "dhcp-no-override"
+        - "dhcp-authoritative"
+        - "dhcp-lease-max=253"
+
+    - name: run the DHCP file with dnsmasq
+      command: "ip netns exec {{namespace_tenant}} dnsmasq -C /etc/netns/{{namespace_tenant}}/{{vm_net}}.conf"
+
+    - name: copy file from namespace to host
+      command: cp /etc/netns/{{ namespace_tenant }}/{{ vm_net }}.conf /etc/{{ vm_net }}.conf
+

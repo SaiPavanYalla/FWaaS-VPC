@@ -1,6 +1,5 @@
 import os
 import json
-import shutil
 import ipaddress
 import subprocess
 
@@ -158,10 +157,11 @@ for tenant in  network_data:
     #Creation of Firewall
     if  "Firewall" in network_data[tenant].keys():
         firewall_data = network_data[tenant]["Firewall"]
+
         #Create int fw net
         if  firewall_data["status"]["internal_net_status"] == "Ready":
             inventory_path = os.path.join(cwd, "inventory.ini")
-            playbook_path = os.path.join(cwd, "ansible_scripts","create_ovs_bridge.yml")
+            playbook_path = os.path.join(cwd, "ansible_scripts","create_fw_ovs_bridge.yml")
             mask = "255.255.255.0"
             binary_octets = [bin(int(octet))[2:].zfill(8) for octet in mask.split(".")]
             cidr_prefix = sum([bin_octet.count("1") for bin_octet in binary_octets])
@@ -195,7 +195,7 @@ for tenant in  network_data:
         #Create ext fw net
         if  firewall_data["status"]["external_net_status"] == "Ready":
             inventory_path = os.path.join(cwd, "inventory.ini")
-            playbook_path = os.path.join(cwd, "ansible_scripts","create_ovs_bridge.yml")
+            playbook_path = os.path.join(cwd, "ansible_scripts","create_fw_ovs_bridge.yml")
             mask = "255.255.255.0"
             binary_octets = [bin(int(octet))[2:].zfill(8) for octet in mask.split(".")]
             cidr_prefix = sum([bin_octet.count("1") for bin_octet in binary_octets])
