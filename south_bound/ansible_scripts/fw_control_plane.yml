@@ -23,6 +23,12 @@
       command: ip route add 10.0.0.0/8 dev {{ IN_int }}
 
     - name: Add route for the internal 172.16.0.0/12 network
+      command: ip route add 172.16.0.0/12 dev enp8s0
+
+    - name: Add route for the internal 192.168.0/16 network
+      command: ip route add 192.168.0/16 dev enp8s0
+    
+
       command: ip route add 172.16.0.0/12 dev {{ IN_int }}
 
     - name: Add route for the internal 192.168.0.0/16 network

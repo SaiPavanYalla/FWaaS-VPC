@@ -393,16 +393,17 @@ for tenant in  network_data:
 
             for key, value in extra_vars.items():
                 command.extend(['-e', f'{key}={value}'])
-
+            
+            firewall_data["status"]["re_route_to_fw_int_status"] = "Running"  
             process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
             stdout, stderr = process.communicate(sudo_password.encode())
 
             if process.returncode != 0:
                 output = stderr.decode('utf-8') if stderr else stdout.decode('utf-8')
-                                
+                firewall_data["status"]["re_route_to_fw_int_status"] = "Ready"                
                 print(f"Ansible playbook failed with error while creating table to re-route traffic :\n{output}")
             else:
-                firewall_data["status"]["external_net_attach_status"] = "Completed"
+                firewall_data["status"]["re_route_to_fw_int_status"] = "Completed"
                 print(f" create table to re-route traffic successfully created in {namespace_tenant}.")
         
 
