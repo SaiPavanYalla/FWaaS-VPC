@@ -14,3 +14,22 @@
         limit: "{{ threshold }}/second"
         jump: "{{policy_action}}"
         state: present
+
+    - name: Add iptables rule to log dropped packets
+      iptables:
+        chain: FORWARD
+        table: filter
+        source: "{{ src_ip }}"
+        destination: "{{ dest_ip }}"
+        protocol: "{{ protocol }}"
+        source_port: "{{ src_port }}"
+        destination_port: "{{ dest_port }}"
+        limit: "{{ threshold }}/second"
+        jump: "LOG"
+        log_prefix: "{{ log_prefix }}"
+        log_level: warning
+        log_tcp_sequence: true
+        log_tcp_options: true
+        log_ip_options: true
+        log_uid: true
+        state: present
