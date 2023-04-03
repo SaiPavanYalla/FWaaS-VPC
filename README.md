@@ -81,7 +81,7 @@ Git needs to be installed in the system to clone this repository to your linux s
 
 1) Run the createTenant.py in the North Bound directory and input the Tenant Name and Tenant Code.
 
-2) Use this Tenant Name and Tenant Code to fill the inputTopology.json. Input the network configuration i.e, VMs and Networks that need to be created in the inputTopology.json.
+2) Use this Tenant Name and Tenant Code to fill the inputTopology.json. Input the network configuration i.e, VMs and Networks and Firewall details that need to be created in the inputTopology.json.
 
 3) Once the inputTopology.json is filled run the northBound.py and check if the given input file is valid.
 

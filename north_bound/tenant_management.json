@@ -10,9 +10,9 @@
         "tenant_code": "123456"
     },
     "T3": {
-        "status": "false",
-        "tenant_name": "",
-        "tenant_code": ""
+        "status": "true",
+        "tenant_name": "team66",
+        "tenant_code": "123456"
     },
     "T4": {
         "status": "false",
