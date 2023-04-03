@@ -1,6 +1,8 @@
 - name: Configure iptables rule on FW
   hosts: "{{host}}"
-  become: true    
+  become: true
+  vars:
+    log_prefix: "IPTABLES-DROPPED: "    
   tasks:
     - name: Add iptables rule for FORWARD chain
       iptables:
