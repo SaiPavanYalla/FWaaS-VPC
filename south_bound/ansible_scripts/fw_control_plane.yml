@@ -1,5 +1,5 @@
 - name: Configure Initial setup on FW
-  hosts: "{{host}}"
+  hosts: T2FW
   become: true    
   vars:
     IN_int: "enp8s0"
@@ -11,7 +11,7 @@
         table: nat
         chain: POSTROUTING
         rule_num: 1
-        out_interface: {{ OUT_int }}
+        out_interface: "{{ OUT_int }}"
         jump: MASQUERADE
         extra_args: "-m comment --comment 'MASQUERADE rule'"
         state: present
@@ -31,13 +31,8 @@
     - name: Add route for the internal 172.16.0.0/12 network
       command: ip route add 172.16.0.0/12 dev {{ IN_int }}
 
-    - name: Add route for the internal 192.168.0/16 network
-      command: ip route add 192.168.0/16 dev {{ IN_int }}
+    - name: Add route for the internal 192.168.0.0/16 network
+      command: ip route add 192.168.0.0/16 dev {{ IN_int }}
       
     - name: Add default route towards external interface
       command: ip route add default via {{ OUT_GW }} dev {{ OUT_int }}
-<<<<<<< HEAD
-    
-=======
-    
->>>>>>> 4d88252ac801a025403ba6139805d6ee589a48d2

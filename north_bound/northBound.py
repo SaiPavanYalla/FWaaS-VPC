@@ -194,7 +194,7 @@ else:
 
 if "Firewall" in tenant_data.keys():
     existing_network_data[tenant_name]["Firewall"]= tenant_data["Firewall"]
-    existing_network_data[tenant_name]["Firewall"]["status"] = {"firewall_status":"Ready","internal_net_status":"Ready","external_net_status":"Ready","internal_net_attach_status":"Ready","external_net_attach_status":"Ready","mgmt_net_attach_status":"Ready"}
+    existing_network_data[tenant_name]["Firewall"]["status"] = {"firewall_status":"Ready","internal_net_status":"Ready","external_net_status":"Ready","internal_net_attach_status":"Ready","external_net_attach_status":"Ready","mgmt_net_attach_status":"Ready","re_route_to_fw_int_status":"Ready"}
 
 
 
