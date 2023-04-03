@@ -4,7 +4,9 @@
   become: yes
   vars:
     vm_net: "{{ namespace_tenant }}_{{vm_net_name}}"
-    dhcp_mask: 255.255.255.0
+    dhcp_mask: 255.255.255.252
+    
+
   tasks:
     - name: Create OVS bridge
       openvswitch_bridge:

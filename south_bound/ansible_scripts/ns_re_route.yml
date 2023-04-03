@@ -3,7 +3,7 @@
   become: true
   vars:
     fw_int_ip: 10.7.7.2
-    fw_ext_ip_sub: 10.8.8.0/24
+    fw_ext_ip_sub: 10.8.8.0/30
   tasks:
     - name: Delete Default route in TGW
       command: sudo ip netns exec {{ namespace_tenant }} ip route del default via 10.3.6.1 dev PGW_{{ namespace_tenant }}_veth1
