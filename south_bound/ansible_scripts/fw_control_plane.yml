@@ -4,11 +4,15 @@
   vars:
     IN_int: "enp8s0"
     OUT_int: "enp9s0"
-    OUT_GW: "172.16.1.1"
+    OUT_GW: "10.8.8.1"
+    IN_GW: "10.7.7.1"
   tasks:
 
     - name: Add iptables rule for NAT public traffic
       command: iptables -t nat -I POSTROUTING 1 -o {{ OUT_int }} -j MASQUERADE
+      
+    - name: Enable IP forwarding
+      shell: echo 1 > /proc/sys/net/ipv4/ip_forward
 
     - name: Add rule to accept all established connection or is related to an established connection
       command: iptables -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
@@ -20,19 +24,13 @@
       command: iptables -P FORWARD DROP
 
     - name: Add route for the internal 10.0.0.0/8 network
-      command: ip route add 10.0.0.0/8 dev {{ IN_int }}
+      command: ip route add 10.0.0.0/8 via {{ IN_gw }} dev {{ IN_int }}
 
     - name: Add route for the internal 172.16.0.0/12 network
-      command: ip route add 172.16.0.0/12 dev enp8s0
-
-    - name: Add route for the internal 192.168.0/16 network
-      command: ip route add 192.168.0/16 dev enp8s0
-    
-
-      command: ip route add 172.16.0.0/12 dev {{ IN_int }}
+      command: ip route add 172.16.0.0/12 via {{ IN_gw }} dev {{ IN_int }}
 
     - name: Add route for the internal 192.168.0.0/16 network
-      command: ip route add 192.168.0.0/16 dev {{ IN_int }}
+      command: ip route add 192.168.0.0/16 via {{ IN_gw }} dev {{ IN_int }}
       
     - name: Add default route towards external interface
       command: ip route add default via {{ OUT_GW }} dev {{ OUT_int }}
