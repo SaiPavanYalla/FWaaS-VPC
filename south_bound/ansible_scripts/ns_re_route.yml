@@ -1,6 +1,22 @@
 - name: Add Default route in Namespace
   hosts: localhost
   become: true
+  vars:
+    fw_int_ip: 10.7.7.2
+    fw_ext_ip_sub: 10.8.8.0/24
   tasks:
-    - name: Add Default route in Namespace
-      command: ip netns exec {{ namespace_tenant }} ip route add default via {{ tenant_net_gw_ip }} dev {{ namespace_tenant }}_FwI_veth0 table 10
+    - name: Delete Default route in TGW
+      command: sudo ip netns exec {{ namespace_tenant }} ip route del default via 10.3.6.1 dev PGW_{{ namespace_tenant }}_veth1
+        
+    - name: Add Default route in TGW for Out
+      command: sudo ip netns exec {{ namespace_tenant }} ip route add default via 10.3.6.1 dev PGW_{{ namespace_tenant }}_veth1 table 100
+    
+    - name: Add Default route in TGW to FW IN
+      command: sudo ip netns exec {{ namespace_tenant }} ip route add default via {{fw_int_ip}} dev {{ namespace_tenant }}_FwI_veth0 table 10
+
+    - name: Create table for Out
+      command: sudo ip netns exec {{ namespace_tenant }} ip rule add from {{fw_ext_ip_sub}} lookup 100 pref 32770
+
+    - name: Create table for FW IN
+      command: sudo ip netns exec {{ namespace_tenant }} ip rule add lookup 10 pref 32880
+
