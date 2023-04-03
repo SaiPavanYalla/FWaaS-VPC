@@ -165,11 +165,11 @@ for tenant in  network_data:
         if  firewall_data["status"]["internal_net_status"] == "Ready":
             inventory_path = os.path.join(cwd, "inventory.ini")
             playbook_path = os.path.join(cwd, "ansible_scripts","create_fw_ovs_bridge.yml")
-            mask = "255.255.255.0"
+            mask = "255.255.255.252"
             binary_octets = [bin(int(octet))[2:].zfill(8) for octet in mask.split(".")]
             cidr_prefix = sum([bin_octet.count("1") for bin_octet in binary_octets])
             cidr_notation = f"/{cidr_prefix}"
-            ovs_network_address = ipaddress.IPv4Network((firewall_data["firewall_internal_subnet"], mask))
+            ovs_network_address = ipaddress.IPv4Network(("10.7.7.0", mask))
             namespace_tenant = network_data[tenant]["namespace_tenant"]
             vm_net_name = "FwI" 
             dhcp_start = ovs_network_address.network_address + 2
@@ -199,11 +199,11 @@ for tenant in  network_data:
         if  firewall_data["status"]["external_net_status"] == "Ready":
             inventory_path = os.path.join(cwd, "inventory.ini")
             playbook_path = os.path.join(cwd, "ansible_scripts","create_fw_ovs_bridge.yml")
-            mask = "255.255.255.0"
+            mask = "255.255.255.252"
             binary_octets = [bin(int(octet))[2:].zfill(8) for octet in mask.split(".")]
             cidr_prefix = sum([bin_octet.count("1") for bin_octet in binary_octets])
             cidr_notation = f"/{cidr_prefix}"
-            ovs_network_address = ipaddress.IPv4Network((firewall_data["firewall_external_subnet"], mask))
+            ovs_network_address = ipaddress.IPv4Network(("10.8.8.0", mask))
             namespace_tenant = network_data[tenant]["namespace_tenant"]
             vm_net_name = "FwE" 
             dhcp_start = ovs_network_address.network_address + 2
@@ -377,16 +377,8 @@ for tenant in  network_data:
             playbook_path = os.path.join(cwd, "ansible_scripts","ns_re_route.yml")
             namespace_tenant =  network_data[tenant]["namespace_tenant"]
 
-            mask = "255.255.255.0"
-            binary_octets = [bin(int(octet))[2:].zfill(8) for octet in mask.split(".")]
-            cidr_prefix = sum([bin_octet.count("1") for bin_octet in binary_octets])
-            cidr_notation = f"/{cidr_prefix}"
-            ovs_network_address = ipaddress.IPv4Network((firewall_data["firewall_internal_subnet"], mask))
-            
-            tenant_net_gw_ip = str(ovs_network_address.network_address + 1) + str(cidr_notation)
-            tenant_net_gw_ip = tenant_net_gw_ip[:-3]
 
-            extra_vars = {'namespace_tenant': namespace_tenant  , 'tenant_net_gw_ip': tenant_net_gw_ip  }
+            extra_vars = {'namespace_tenant': namespace_tenant   }
 
             command = ['sudo','ansible-playbook', playbook_path ,'-i', inventory_path]
             sudo_password = "mmrj2023"

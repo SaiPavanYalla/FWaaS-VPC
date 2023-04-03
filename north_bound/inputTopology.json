@@ -1,5 +1,5 @@
 {
-    "tenant_name": "team63",
+    "tenant_name": "team66",
     "tenant_code": "123456",
     "VMs": [
         
@@ -55,9 +55,7 @@
     "Firewall":{
                 "firewall_vcpus": "2",
                 "firewall_ram_mb": "2048",
-                "firewall_disk_size": "10",
-                "firewall_internal_subnet": "172.16.0.0",
-                "firewall_external_subnet": "172.16.1.0"
+                "firewall_disk_size": "10"
                 }   
 
 }
