@@ -1,0 +1,6 @@
+- name: Add Default route in Namespace
+  hosts: localhost
+  become: true
+  tasks:
+    - name: Add Default route in Namespace
+      command: ip netns exec {{ namespace_tenant }} ip route add default via {{ tenant_net_gw_ip }} dev {{ namespace_tenant }}_FwI_veth0 table 10

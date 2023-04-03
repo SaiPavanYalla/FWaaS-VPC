@@ -372,19 +372,38 @@ for tenant in  network_data:
                 print(f" The External Interface/Connection has been successfully created between firewall {hostname} and External Network {vm_net_name} in {namespace_tenant}.")
 
         #create table to re-route traffic
-        if firewall_data["status"]["internal_net_attach_status"] == "Completed":
-            command = "sudo ip netns exec T1 ip route add default via 172.16.0.1 dev T1_FwI_veth0 table 10"
+        if firewall_data["status"]["internal_net_attach_status"] == "Completed" and firewall_data["status"]["re_route_to_fw_int_status"] == "Ready":
+            inventory_path = os.path.join(cwd, "inventory.ini")
+            playbook_path = os.path.join(cwd, "ansible_scripts","ns_re_route.yml")
+            namespace_tenant =  network_data[tenant]["namespace_tenant"]
+
+            mask = "255.255.255.0"
+            binary_octets = [bin(int(octet))[2:].zfill(8) for octet in mask.split(".")]
+            cidr_prefix = sum([bin_octet.count("1") for bin_octet in binary_octets])
+            cidr_notation = f"/{cidr_prefix}"
+            ovs_network_address = ipaddress.IPv4Network((firewall_data["firewall_internal_subnet"], mask))
+            
+            tenant_net_gw_ip = str(ovs_network_address.network_address + 1) + str(cidr_notation)
+            tenant_net_gw_ip = tenant_net_gw_ip[:-3]
+
+            extra_vars = {'namespace_tenant': namespace_tenant  , 'tenant_net_gw_ip': tenant_net_gw_ip  }
+
+            command = ['sudo','ansible-playbook', playbook_path ,'-i', inventory_path]
+            sudo_password = "mmrj2023"
+
+            for key, value in extra_vars.items():
+                command.extend(['-e', f'{key}={value}'])
+
             process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
             stdout, stderr = process.communicate(sudo_password.encode())
 
             if process.returncode != 0:
                 output = stderr.decode('utf-8') if stderr else stdout.decode('utf-8')
-                
-                print(f"table to re-route traffic to FW INT failed\n{output}")
+                                
+                print(f"Ansible playbook failed with error while creating table to re-route traffic :\n{output}")
             else:
                 firewall_data["status"]["external_net_attach_status"] = "Completed"
-                print(f" Table to re-route traffic to FW INT Success")
-            
+                print(f" create table to re-route traffic successfully created in {namespace_tenant}.")
         
 
 

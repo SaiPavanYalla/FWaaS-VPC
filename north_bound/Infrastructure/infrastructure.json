@@ -68,8 +68,21 @@
                 "external_net_status": "Completed",
                 "internal_net_attach_status": "Completed",
                 "external_net_attach_status": "Completed",
-                "mgmt_net_attach_status": "Completed"
-            }
+                "mgmt_net_attach_status": "Completed",
+                "re_route_to_fw_int_status": "Completed"
+            },
+            "Policies": [
+                {
+                    "src_ip": "192.168.1.0/24",
+                    "src_port": "23",
+                    "dest_ip": "192.168.2.0/24",
+                    "dest_port": "22",
+                    "protocol": "tcp",
+                    "policy_action": "ACCEPT",
+                    "threshold": "15",
+                    "status": "Ready"
+                }
+            ]
         },
         "namespace_tenant": "T2"
     }
