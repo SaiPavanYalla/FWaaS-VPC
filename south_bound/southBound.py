@@ -371,11 +371,20 @@ for tenant in  network_data:
                 firewall_data["status"]["external_net_attach_status"] = "Completed"
                 print(f" The External Interface/Connection has been successfully created between firewall {hostname} and External Network {vm_net_name} in {namespace_tenant}.")
 
-       
+        #create table to re-route traffic
+        if firewall_data["status"]["internal_net_attach_status"] == "Completed":
+            command = "sudo ip netns exec T1 ip route add default via 172.16.0.1 dev T1_FwI_veth0 table 10"
+            process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
+            stdout, stderr = process.communicate(sudo_password.encode())
 
-
-
-
+            if process.returncode != 0:
+                output = stderr.decode('utf-8') if stderr else stdout.decode('utf-8')
+                
+                print(f"table to re-route traffic to FW INT failed\n{output}")
+            else:
+                firewall_data["status"]["external_net_attach_status"] = "Completed"
+                print(f" Table to re-route traffic to FW INT Success")
+            
         
 
 
