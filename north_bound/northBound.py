@@ -55,16 +55,6 @@ tenant_data["namespace_tenant"] = namespace
 source_path = os.getcwd() + "/" + input_sample_json
 destination_path = os.path.join(os.getcwd(),"tenantTopology",tenant_name,"inputTopology_" + str(datetime.datetime.now()) + ".json")
 
-#print(destination_path)
-
-if not os.path.exists(os.path.join(os.getcwd(), "tenantTopology")):
-    os.makedirs(os.path.join(os.getcwd(), "tenantTopology"))
-
-if not os.path.exists(os.path.join(os.getcwd(), "tenantTopology",tenant_name)):
-    os.makedirs(os.path.join(os.getcwd(), "tenantTopology",tenant_name))
-
-shutil.copy(source_path,destination_path )
-
 
 # Get the list of VMs
 vms = tenant_data['VMs']
@@ -140,15 +130,15 @@ tenant_data['Networks'] = networks
 #Now comes the appending part
 
 
-network_destination_path = os.path.join(os.getcwd(), "Network")
+network_destination_path = os.path.join(os.getcwd(), "Infrastructure")
 
 existing_network_data ={}
 
 if not os.path.exists(network_destination_path):
     os.makedirs(network_destination_path)
 
-if os.path.exists(os.path.join(os.getcwd(), "Network","network.json")):
-    with open(os.path.join(os.getcwd(), "Network","network.json") , 'r') as file:
+if os.path.exists(os.path.join(os.getcwd(), "Infrastructure","infrastructure.json")):
+    with open(os.path.join(os.getcwd(), "Infrastructure","infrastructure.json") , 'r') as file:
         existing_network_data = json.load(file)
 
 
@@ -161,10 +151,10 @@ existing_network_list = []
 
 
 
-if existing_network_data:
+if existing_network_data != None:
     if tenant_name in existing_network_data.keys():
 
-        #checking if the network or VM already exists in the Network.json
+        #checking if the network or VM already exists in the infrastructure.json
         for network in existing_network_data[tenant_name]["Networks"]:
             existing_network_list.append(network["network_name"])
             if network["network_name"] in network_list:
@@ -192,31 +182,35 @@ if existing_network_data:
         
         for vm in tenant_data["VMs"]:
             existing_network_data[tenant_name]["VMs"].append(vm)
-
-            
-        else:
-            existing_network_data[tenant_name]
+        
+        if  "Firewall" in existing_network_data[tenant_name].keys():
+            print("Firewall is already present in the Network")
+            exit()
 
     else:
         existing_network_data[tenant_name]= tenant_data
 else:
     existing_network_data[tenant_name]= tenant_data
 
-
-
-if  "Firewall" in existing_network_data[tenant_name].keys():
-    print("Firewall is already present in the Network")
-    exit()
-else:
+if "Firewall" in tenant_data.keys():
     existing_network_data[tenant_name]["Firewall"]= tenant_data["Firewall"]
     existing_network_data[tenant_name]["Firewall"]["status"] = {"firewall_status":"Ready","internal_net_status":"Ready","external_net_status":"Ready","internal_net_attach_status":"Ready","external_net_attach_status":"Ready","mgmt_net_attach_status":"Ready"}
 
 
 
-with open(network_destination_path + "/" + "network.json", "w") as f1:
+
+
+with open(network_destination_path + "/" + "infrastructure.json", "w") as f1:
     json.dump(existing_network_data, f1,indent=4)
 
 
+if not os.path.exists(os.path.join(os.getcwd(), "tenantTopology")):
+    os.makedirs(os.path.join(os.getcwd(), "tenantTopology"))
+
+if not os.path.exists(os.path.join(os.getcwd(), "tenantTopology",tenant_name)):
+    os.makedirs(os.path.join(os.getcwd(), "tenantTopology",tenant_name))
+
+shutil.copy(source_path,destination_path )
 
 
 

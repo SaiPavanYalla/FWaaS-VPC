@@ -57,6 +57,6 @@ if process.returncode != 0:
     
     print(f"Ansible playbook failed with error while creating a management network :\n{output}")
 else:
-    print(f"Ansible playbook successfull while creating a management network :\n{output}")
+    print(f"Ansible playbook successfull while creating a management network")
 
 

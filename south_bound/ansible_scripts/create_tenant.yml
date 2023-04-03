@@ -30,7 +30,7 @@
       command: ip netns exec {{ namespace_tenant }} ip link set dev {{ veth_t }} up
 
     - name: assign as DHClient for veth_t
-      command: ip netns exec T1 dhclient PGW_T1_veth1
+      command: ip netns exec {{ namespace_tenant }} dhclient PGW_{{ namespace_tenant }}_veth1
 
     - name: Create folder for Namespace
       file:

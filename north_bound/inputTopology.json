@@ -1,30 +1,63 @@
 {
-    "tenant_name":"team36",
+    "tenant_name": "team63",
     "tenant_code": "123456",
     "VMs": [
         
-               
+                {
+                    "vm_name": "VM3",
+                    "vm_vcpus": "2",
+                    "vm_ram_mb": "2048",
+                    "vm_disk_size": "10",
+                    "connections": [
+                        {
+                            "Connected_to": [
+                                "net1",
+                                "net2"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "vm_name": "VM4",
+                    "vm_vcpus": "2",
+                    "vm_ram_mb": "2048",
+                    "vm_disk_size": "10",
+                    "connections": [
+                        {
+                            "Connected_to": [
+                                "net1",
+                                "net2"
+                            ]
+                        }
+                    ]
+                    
+                }
             ],
 
-        "Networks" : [
-
-         
-         
-          
-        ],
-
-       "Firewall":{
-        "firewall_vcpus": "2",
-        "firewall_ram_mb": "2048",
-        "firewall_disk_size": "10",
-        "firewall_internal_subnet": "172.16.0.0",
-        "firewall_external_subnet": "172.16.1.0"
+    "Networks" : [
+                    {
+                        "network_name": "net1",
+                        "subnet": "192.168.11.0",
+                        "mask": "255.255.255.0",
+                        "status": "Completed"
+                    },
+                    {
+                        "network_name": "net2",
+                        "subnet": "192.168.12.0",
+                        "mask": "255.255.255.0",
+                        "status": "Completed"
+                    }
         
-
         
-       
+        
+                    ],
 
+    "Firewall":{
+                "firewall_vcpus": "2",
+                "firewall_ram_mb": "2048",
+                "firewall_disk_size": "10",
+                "firewall_internal_subnet": "172.16.0.0",
+                "firewall_external_subnet": "172.16.1.0"
+                }   
 
-       }   
-
-        }
+}

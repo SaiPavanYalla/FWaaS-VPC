@@ -45,8 +45,8 @@ tenant_code = "123456"
 
 
 network_data = {}
-if os.path.exists(os.path.join(os.getcwd(), "Network","network.json")):
-    with open(os.path.join(os.getcwd(), "Network","network.json") , 'r') as file:
+if os.path.exists(os.path.join(os.getcwd(), "Infrastructure","infrastructure.json")):
+    with open(os.path.join(os.getcwd(), "Infrastructure","infrastructure.json") , 'r') as file:
         network_data = json.load(file)
 
 if not tenant_name in network_data.keys():
@@ -241,7 +241,7 @@ network_data[tenant_name]["Firewall"]["Policies"] = existing_firewall_policies
 
 
 
-with open(os.path.join(os.getcwd(), "Network","network.json"), "w") as f1:
+with open(os.path.join(os.getcwd(), "Infrastructure","infrastructure.json"), "w") as f1:
     json.dump(network_data, f1,indent=4)
 
 

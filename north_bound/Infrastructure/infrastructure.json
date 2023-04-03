@@ -1,6 +1,6 @@
 {
-    "team36": {
-        "tenant_name": "team36",
+    "team63": {
+        "tenant_name": "team63",
         "tenant_code": "123456",
         "VMs": [
             {
@@ -12,16 +12,14 @@
                     {
                         "Connected_to": [
                             "net1",
-                            "net2",
-                            "net5"
+                            "net2"
                         ]
                     }
                 ],
                 "status": "Completed",
                 "connection_status": {
                     "net1": "Completed",
-                    "net2": "Completed",
-                    "net5": "Completed"
+                    "net2": "Completed"
                 }
             },
             {
@@ -32,36 +30,15 @@
                 "connections": [
                     {
                         "Connected_to": [
-                            "net4",
-                            "net5"
-                        ]
-                    }
-                ],
-                "status": "Completed",
-                "connection_status": {
-                    "net4": "Completed",
-                    "net5": "Completed"
-                }
-            },
-            {
-                "vm_name": "VM5",
-                "vm_vcpus": "2",
-                "vm_ram_mb": "2048",
-                "vm_disk_size": "10",
-                "connections": [
-                    {
-                        "Connected_to": [
                             "net1",
-                            "net2",
-                            "net4"
+                            "net2"
                         ]
                     }
                 ],
                 "status": "Completed",
                 "connection_status": {
                     "net1": "Completed",
-                    "net2": "Completed",
-                    "net4": "Completed"
+                    "net2": "Completed"
                 }
             }
         ],
@@ -77,21 +54,8 @@
                 "subnet": "192.168.12.0",
                 "mask": "255.255.255.0",
                 "status": "Completed"
-            },
-            {
-                "network_name": "net4",
-                "subnet": "192.168.17.0",
-                "mask": "255.255.255.0",
-                "status": "Completed"
-            },
-            {
-                "network_name": "net5",
-                "subnet": "192.168.19.0",
-                "mask": "255.255.255.0",
-                "status": "Completed"
             }
         ],
-        "namespace_tenant": "T1",
         "Firewall": {
             "firewall_vcpus": "2",
             "firewall_ram_mb": "2048",
@@ -105,19 +69,8 @@
                 "internal_net_attach_status": "Completed",
                 "external_net_attach_status": "Completed",
                 "mgmt_net_attach_status": "Completed"
-            },
-            "Policies": [
-                {
-                    "src_ip": "192.168.1.0/24",
-                    "src_port": "23",
-                    "dest_ip": "192.168.2.0/24",
-                    "dest_port": "22",
-                    "protocol": "tcp",
-                    "policy_action": "ACCEPT",
-                    "threshold": "15",
-                    "status": "Completed"
-                }
-            ]
-        }
+            }
+        },
+        "namespace_tenant": "T2"
     }
 }

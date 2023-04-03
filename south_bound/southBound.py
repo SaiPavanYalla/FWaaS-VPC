@@ -10,7 +10,7 @@ cwd = os.getcwd()
 parent_dir = os.path.dirname(cwd)
 
 # Navigate to the Network directory
-network_json_file_path  = os.path.join(parent_dir, "north_bound", "Network","network.json")
+network_json_file_path  = os.path.join(parent_dir, "north_bound", "Infrastructure","infrastructure.json")
 
 # Open the file for reading
 with open(network_json_file_path, 'r') as f:
