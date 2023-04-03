@@ -50,6 +50,7 @@ def create_network(network,network_data,tenant,i):
         else:
             
             network_data[tenant]["Networks"][i]["status"] = "Completed"
+            print(f" The Network {vm_net_name} has been successfully created in {namespace_tenant}.")
     return network_data
 
 
@@ -84,6 +85,7 @@ def create_vm(vm,network_data,tenant,j):
         print(f"Ansible playbook failed with error while creating a VM :\n{output}")
     else:
         network_data[tenant]["VMs"][j]["status"] = "Completed"
+        print(f" The Guest VM {hostname} has been successfully created in {namespace_tenant}.")
     return network_data
 
 
@@ -118,6 +120,7 @@ def attach_interface(vm,network_data,tenant,connection,k):
     else:
         
         network_data[tenant]["VMs"][k]["connection_status"][connection] = "Completed"
+        print(f" The Interface/Connection has been successfully created between {hostname} and {vm_net_name} in {namespace_tenant}.")
 
 
 
@@ -189,7 +192,7 @@ for tenant in  network_data:
                 firewall_data["status"]["internal_net_status"] = "Ready"
                 print(f"Ansible playbook failed with error while creating Internal network of Firewall:\n{output}")
             else:
-                
+                print(f" The Internal network {vm_net_name} for Firewall has been successfully created in {namespace_tenant}.")
                 firewall_data["status"]["internal_net_status"] = "Completed"
         
         #Create ext fw net
@@ -225,6 +228,7 @@ for tenant in  network_data:
             else:
                 
                 firewall_data["status"]["external_net_status"] = "Completed"
+                print(f" The External network {vm_net_name} for Firewall  has been successfully created in {namespace_tenant}.")
         
         #Firewall VM creation
         if  firewall_data["status"]["firewall_status"] == "Ready":
@@ -259,6 +263,45 @@ for tenant in  network_data:
                 print(f"Ansible playbook failed with error while creating a firewall VM :\n{output}")
             else:
                 firewall_data["status"]["firewall_status"] = "Completed"
+                print(f" The Firewall {hostname} has been successfully created in {namespace_tenant}.")
+
+        #attach management to firewall
+        if  firewall_data["status"]["mgmt_net_attach_status"] == "Ready" and firewall_data["status"]["firewall_status"] == "Completed" :
+            inventory_path = os.path.join(cwd, "inventory.ini")
+            playbook_path = os.path.join(cwd, "ansible_scripts","attach_mgmt.yml")
+           
+            namespace_tenant =  network_data[tenant]["namespace_tenant"]
+            last_mac ='{:02X}'.format(int(namespace_tenant.replace("T","")))
+            vm_name = namespace_tenant + "FW" 
+            src_dir= os.path.join(cwd , "templates")
+            extra_vars = { 'namespace_tenant': namespace_tenant ,'vm_name': vm_name, 'last_mac': last_mac ,'src_dir': src_dir }
+
+            command = ['sudo','ansible-playbook', playbook_path ,'-i', inventory_path]
+            sudo_password = "mmrj2023"
+
+            for key, value in extra_vars.items():
+                command.extend(['-e', f'{key}={value}'])
+
+
+            firewall_data["status"]["mgmt_net_attach_status"] = "Running"
+            
+
+            process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
+            stdout, stderr = process.communicate(sudo_password.encode())
+
+            if process.returncode != 0:
+                output = stderr.decode('utf-8') if stderr else stdout.decode('utf-8')
+                firewall_data["status"]["mgmt_net_attach_status"] = "Ready"
+                
+                print(f"Ansible playbook failed with error while creating a management network attach :\n{output}")
+            else:
+                firewall_data["status"]["mgmt_net_attach_status"] = "Completed"
+                print(f" The Management Interface/Connection has been successfully created between firewall  and Host VM in {namespace_tenant}.")
+
+
+
+
+
 
         #Attach int fw net
         if  firewall_data["status"]["internal_net_attach_status"] == "Ready" and firewall_data["status"]["firewall_status"] == "Completed" and firewall_data["status"]["internal_net_status"] == "Completed":
@@ -291,6 +334,7 @@ for tenant in  network_data:
                 print(f"Ansible playbook failed with error while creating a internal network attach :\n{output}")
             else:
                 firewall_data["status"]["internal_net_attach_status"] = "Completed"
+                print(f" The Internal Interface/Connection has been successfully created between firewall {hostname} and Internal Network {vm_net_name} in {namespace_tenant}.")
 
 
 
@@ -325,43 +369,14 @@ for tenant in  network_data:
                 print(f"Ansible playbook failed with error while creating a external network attach :\n{output}")
             else:
                 firewall_data["status"]["external_net_attach_status"] = "Completed"
+                print(f" The External Interface/Connection has been successfully created between firewall {hostname} and External Network {vm_net_name} in {namespace_tenant}.")
 
        
 
 
 
 
-        #attach management to firewall
-        if  firewall_data["status"]["mgmt_net_attach_status"] == "Ready" and firewall_data["status"]["firewall_status"] == "Completed" :
-            inventory_path = os.path.join(cwd, "inventory.ini")
-            playbook_path = os.path.join(cwd, "ansible_scripts","attach_mgmt.yml")
-           
-            namespace_tenant =  network_data[tenant]["namespace_tenant"]
-            last_mac ='{:02X}'.format(int(namespace_tenant.replace("T","")))
-            vm_name = namespace_tenant + "FW" 
-            src_dir= os.path.join(cwd , "templates")
-            extra_vars = { 'namespace_tenant': namespace_tenant ,'vm_name': vm_name, 'last_mac': last_mac ,'src_dir': src_dir }
-
-            command = ['sudo','ansible-playbook', playbook_path ,'-i', inventory_path]
-            sudo_password = "mmrj2023"
-
-            for key, value in extra_vars.items():
-                command.extend(['-e', f'{key}={value}'])
-
-
-            firewall_data["status"]["mgmt_net_attach_status"] = "Running"
-            
-
-            process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
-            stdout, stderr = process.communicate(sudo_password.encode())
-
-            if process.returncode != 0:
-                output = stderr.decode('utf-8') if stderr else stdout.decode('utf-8')
-                firewall_data["status"]["mgmt_net_attach_status"] = "Ready"
-                
-                print(f"Ansible playbook failed with error while creating a management network attach :\n{output}")
-            else:
-                firewall_data["status"]["mgmt_net_attach_status"] = "Completed"
+        
 
 
 
