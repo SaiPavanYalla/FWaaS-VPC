@@ -1,4 +1,4 @@
-- name: Configure iptables rule on FW
+- name: Configure Initial setup on FW
   hosts: "{{host}}"
   become: true    
   tasks:
@@ -29,4 +29,8 @@
 
     - name: Add route for the internal 192.168.0/16 network
       command: ip route add 192.168.0/16 dev enp8s0
+<<<<<<< HEAD
     
+=======
+    
+>>>>>>> 4d88252ac801a025403ba6139805d6ee589a48d2
