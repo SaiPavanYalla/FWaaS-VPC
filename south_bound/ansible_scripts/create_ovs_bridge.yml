@@ -38,6 +38,12 @@
         path: "/etc/netns/{{ namespace_tenant }}/{{ vm_net }}.conf"
         state: touch
     
+    - name: Create the DHCP file in Host
+      become: true
+      file:
+        path: "/etc/{{ vm_net }}.conf"
+        state: touch
+    
     - name: Add lines to DHCP file
       lineinfile:
         path: "/etc/netns/{{ namespace_tenant }}/{{ vm_net }}.conf"
@@ -61,4 +67,4 @@
 
     # - name: network redirected
     #   command: ip netns exec {{ namespace_tenant }} ip rule add iif {{ vm_net }}_veth0 oif PGW_{{ namespace_tenant }}_veth1 table 10 pref 32771
-    
+

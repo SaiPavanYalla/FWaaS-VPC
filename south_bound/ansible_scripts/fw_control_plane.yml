@@ -1,5 +1,5 @@
 - name: Configure Initial setup on FW
-  hosts: T2FW
+  hosts: T3FW
   become: true    
   vars:
     IN_int: "enp8s0"
@@ -12,7 +12,11 @@
       command: iptables -t nat -I POSTROUTING 1 -o {{ OUT_int }} -j MASQUERADE
       
     - name: Enable IP forwarding
-      shell: echo 1 > /proc/sys/net/ipv4/ip_forward
+      sysctl:
+        name: net.ipv4.ip_forward
+        value: 1
+        state: present
+        reload: yes
 
     - name: Add rule to accept all established connection or is related to an established connection
       command: iptables -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
