@@ -27,12 +27,12 @@
     - name: Create the DHCP file for mgmt
       become: true
       file:
-        path: "/etc/{{ vm_net }}.conf"
+        path: "/etc/{{ vm_net }}_fwaas.conf"
         state: touch
 
     - name: Add lines to DHCP file
       lineinfile:
-        path: "/etc/{{ vm_net }}.conf"
+        path: "/etc/{{ vm_net }}_fwaas.conf"
         line: "{{ item }}"
       with_items:
         - "strict-order"
@@ -52,7 +52,7 @@
           {% endfor %}     
 
     - name: run the DHCP file with dnsmasq
-      command: "dnsmasq -C /etc/{{ vm_net }}.conf"
+      command: "dnsmasq -C /etc/{{ vm_net }}_fwaas.conf"
     
     
 
