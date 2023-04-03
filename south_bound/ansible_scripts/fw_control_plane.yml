@@ -2,15 +2,31 @@
   hosts: "{{host}}"
   become: true    
   tasks:
-    - name: Add iptables rule for FORWARD chain
+    - name: Add iptables rule for NAT public traffic
       iptables:
-        chain: FORWARD
-        table: filter
-        source: "{{ src_ip }}"
-        destination: "{{ dest_ip }}"
-        protocol: "{{ protocol }}"
-        source_port: "{{ src_port }}"
-        destination_port: "{{ dest_port }}"
-        limit: "{{ threshold }}/second"
-        jump: "{{policy_action}}"
+        table: nat
+        chain: POSTROUTING
+        rule_num: 1
+        out_interface: "enp9s0"
+        jump: MASQUERADE
+        extra_args: "-m comment --comment 'MASQUERADE rule'"
         state: present
+
+    - name: Add rule to accept all established connection or is related to an established connection
+      command: iptables -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+
+    - name: Add iptables rule to drop all invalid packets
+      command: iptables -A INPUT -m conntrack --ctstate INVALID -j DROP
+
+    - name: Add rule to default deny  
+      command: iptables -P FORWARD DROP
+
+    - name: Add route for the internal 10.0.0.0/8 network
+      command: ip route add 10.0.0.0/8 dev enp8s0
+
+    - name: Add route for the internal 172.16.0.0/12 network
+      command: ip route add 172.16.0.0/12 dev enp8s0
+
+    - name: Add route for the internal 192.168.0/16 network
+      command: ip route add 192.168.0/16 dev enp8s0
+    
