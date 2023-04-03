@@ -30,8 +30,4 @@
         jump: "LOG"
         log_prefix: "{{ log_prefix }}"
         log_level: warning
-        log_tcp_sequence: true
-        log_tcp_options: true
-        log_ip_options: true
-        log_uid: true
         state: present

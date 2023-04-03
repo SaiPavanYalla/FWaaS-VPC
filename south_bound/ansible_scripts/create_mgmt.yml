@@ -67,7 +67,7 @@
         - "ansible_user=mmrj"
         - "ansible_password=mmrj"
         - "host_key_checking=False"
-        - "ssh_args = -o StrictHostKeyChecking=no"
+        - "ansible_ssh_common_args = -o StrictHostKeyChecking=no"
 
       vars:
         hosts: |

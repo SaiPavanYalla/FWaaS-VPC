@@ -74,13 +74,53 @@
             "Policies": [
                 {
                     "src_ip": "192.168.1.0/24",
-                    "src_port": "23",
+                    "src_port": "0:65535",
                     "dest_ip": "192.168.2.0/24",
                     "dest_port": "22",
                     "protocol": "tcp",
                     "policy_action": "ACCEPT",
                     "threshold": "15",
-                    "status": "Ready"
+                    "status": "Completed"
+                },
+                {
+                    "src_ip": "192.168.12.0/24",
+                    "src_port": "0:65535",
+                    "dest_ip": "0.0.0.0/0",
+                    "dest_port": "0:65535",
+                    "protocol": "udp",
+                    "policy_action": "ACCEPT",
+                    "threshold": "15",
+                    "status": "Completed"
+                },
+                {
+                    "src_ip": "192.168.11.0/24",
+                    "src_port": "0:65535",
+                    "dest_ip": "0.0.0.0/0",
+                    "dest_port": "0:65535",
+                    "protocol": "udp",
+                    "policy_action": "ACCEPT",
+                    "threshold": "15",
+                    "status": "Completed"
+                },
+                {
+                    "src_ip": "192.168.12.0/24",
+                    "src_port": "0:65535",
+                    "dest_ip": "0.0.0.0/0",
+                    "dest_port": "0:65535",
+                    "protocol": "tcp",
+                    "policy_action": "ACCEPT",
+                    "threshold": "15",
+                    "status": "Completed"
+                },
+                {
+                    "src_ip": "192.168.11.0/24",
+                    "src_port": "0:65535",
+                    "dest_ip": "0.0.0.0/0",
+                    "dest_port": "0:65535",
+                    "protocol": "tcp",
+                    "policy_action": "ACCEPT",
+                    "threshold": "15",
+                    "status": "Completed"
                 }
             ]
         },

@@ -6,15 +6,9 @@
     OUT_int: "enp9s0"
     OUT_GW: "172.16.1.1"
   tasks:
+
     - name: Add iptables rule for NAT public traffic
-      iptables:
-        table: nat
-        chain: POSTROUTING
-        rule_num: 1
-        out_interface: "{{ OUT_int }}"
-        jump: MASQUERADE
-        extra_args: "-m comment --comment 'MASQUERADE rule'"
-        state: present
+      command: iptables -t nat -I POSTROUTING 1 -o {{ OUT_int }} -j MASQUERADE
 
     - name: Add rule to accept all established connection or is related to an established connection
       command: iptables -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT

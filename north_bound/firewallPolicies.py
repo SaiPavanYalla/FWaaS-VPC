@@ -18,6 +18,9 @@ def is_valid_port(port):
         if str(port) == "any":
             return True
         
+        if str(port) == "0:65535":
+            return True
+
         port = int(port)
         if port >= 1 and port <= 65535:
             return True
