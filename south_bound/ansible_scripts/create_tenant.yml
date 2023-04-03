@@ -39,7 +39,7 @@
 
     - name: Configure NAT from FW
       command: ip netns exec {{ namespace_tenant }} iptables -t nat -I POSTROUTING 1 -o {{ veth_t }} -j MASQUERADE
-    
+
 
 
 

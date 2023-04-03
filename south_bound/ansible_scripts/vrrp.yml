@@ -38,14 +38,6 @@
             state: started
 
 
-
-
-
-
-
-
-
-
 keepalived.conf.j2
 vrrp_script chk_http_port {
     script "/usr/bin/nc -z -w 2 {{ vip_address }} 80"
