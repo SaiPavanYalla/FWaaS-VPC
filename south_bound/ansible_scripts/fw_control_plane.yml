@@ -10,7 +10,7 @@
         out_interface: "enp9s0"
         jump: MASQUERADE
         extra_args: "-m comment --comment 'MASQUERADE rule'"
-        state: present
+        state: present  
 
     - name: Add rule to accept all established connection or is related to an established connection
       command: iptables -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
@@ -29,8 +29,4 @@
 
     - name: Add route for the internal 192.168.0/16 network
       command: ip route add 192.168.0/16 dev enp8s0
-<<<<<<< HEAD
     
-=======
-    
->>>>>>> 4d88252ac801a025403ba6139805d6ee589a48d2

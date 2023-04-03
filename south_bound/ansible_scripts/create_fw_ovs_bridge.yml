@@ -57,6 +57,6 @@
     - name: run the DHCP file with dnsmasq
       command: "ip netns exec {{namespace_tenant}} dnsmasq -C /etc/netns/{{namespace_tenant}}/{{vm_net}}.conf"
 
-    - name: copy file from namespace to host
-      command: cp /etc/netns/{{ namespace_tenant }}/{{ vm_net }}.conf /etc/{{ vm_net }}.conf
+    # - name: copy file from namespace to host
+    #   command: cp /etc/netns/{{ namespace_tenant }}/{{ vm_net }}.conf /etc/{{ vm_net }}.conf
 
