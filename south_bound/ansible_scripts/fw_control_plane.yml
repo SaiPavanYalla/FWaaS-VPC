@@ -4,8 +4,8 @@
   vars:
     IN_int: "enp8s0"
     OUT_int: "enp9s0"
-    OUT_GW: "10.8.8.1"
-    IN_GW: "10.7.7.1"
+    OUT_gw: "10.8.8.1"
+    IN_gw: "10.7.7.1"
   tasks:
 
     - name: Add iptables rule for NAT public traffic
@@ -37,4 +37,4 @@
       command: ip route add 192.168.0.0/16 via {{ IN_gw }} dev {{ IN_int }}
       
     - name: Add default route towards external interface
-      command: ip route add default via {{ OUT_GW }} dev {{ OUT_int }}
+      command: ip route add default via {{ OUT_gw }} dev {{ OUT_int }}
