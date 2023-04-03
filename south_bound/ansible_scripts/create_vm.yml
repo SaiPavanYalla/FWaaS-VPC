@@ -27,7 +27,7 @@
         mode: 0660
       register: copy_results
 
-    - name: Get VMs list
+    - name: Resize VMs if needed
       command: "qemu-img resize {{ libvirt_pool_dir }}/{{ vm_name }}.qcow2 {{ vm_disksize_gb  }}G"
       when: vm_disksize_gb | int > 10
 
