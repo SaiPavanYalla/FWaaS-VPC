@@ -1,13 +1,17 @@
 - name: Configure Initial setup on FW
   hosts: "{{host}}"
   become: true    
+  vars:
+    IN_int: "enp8s0"
+    OUT_int: "enp9s0"
+    OUT_GW: "172.16.1.1"
   tasks:
     - name: Add iptables rule for NAT public traffic
       iptables:
         table: nat
         chain: POSTROUTING
         rule_num: 1
-        out_interface: "enp9s0"
+        out_interface: {{ OUT_int }}
         jump: MASQUERADE
         extra_args: "-m comment --comment 'MASQUERADE rule'"
         state: present
@@ -22,13 +26,16 @@
       command: iptables -P FORWARD DROP
 
     - name: Add route for the internal 10.0.0.0/8 network
-      command: ip route add 10.0.0.0/8 dev enp8s0
+      command: ip route add 10.0.0.0/8 dev {{ IN_int }}
 
     - name: Add route for the internal 172.16.0.0/12 network
-      command: ip route add 172.16.0.0/12 dev enp8s0
+      command: ip route add 172.16.0.0/12 dev {{ IN_int }}
 
     - name: Add route for the internal 192.168.0/16 network
-      command: ip route add 192.168.0/16 dev enp8s0
+      command: ip route add 192.168.0/16 dev {{ IN_int }}
+      
+    - name: Add default route towards external interface
+      command: ip route add default via {{ OUT_GW }} dev {{ OUT_int }}
 <<<<<<< HEAD
     
 =======
