@@ -13,11 +13,10 @@ def is_valid_ipv4_address(address):
         # The address is not a valid IPv4 address
         return False
     return True
-    
+
 def is_valid_port(port):
     try:
-        if str(port) == "any":
-            return True
+    
         
         if str(port) == "0:65535":
             return True
@@ -41,7 +40,7 @@ def are_dicts_equal_except_key(d1, d2, key):
 
 firewall_policy_list = []
 
-tenant_name =  "team63"
+tenant_name =  "team66"
 tenant_code = "123456"
 
 #tenant_name = input("Please enter your Tenant Name: ") 
@@ -138,15 +137,36 @@ with open('firewallPolicies.csv', 'r') as file:
     for firewall_policy_obj in reader:
         if not (is_valid_ipv4_address(firewall_policy_obj["src_ip"]) and is_valid_ipv4_address(firewall_policy_obj["dest_ip"])):
             print("The IP addresses given are not valid in the row below")
-            print(is_valid_ipv4_address(firewall_policy_obj["src_ip"]))
-            print( is_valid_ipv4_address(firewall_policy_obj["dest_ip"]))
+           
             print(firewall_policy_obj)
             exit()
 
-        if not (is_valid_port(firewall_policy_obj["src_port"]) and is_valid_port(firewall_policy_obj["dest_port"]) ):
-            print("The Port Numbers given are not valid in the row below")
-            print(firewall_policy_obj)
-            exit()
+        
+
+        if firewall_policy_obj["policy_action"] == "ACCEPT":
+            if not ( int(firewall_policy_obj["threshold"]) > 1 ):
+                print("The threshold should be greater than one for the policy action as ACCEPT for this below row")
+                print(firewall_policy_obj)
+                exit()
+
+        elif firewall_policy_obj["policy_action"] == "DROP" :
+            if not ( int(firewall_policy_obj["threshold"]) == 0 ):
+                print("The threshold should be equal to zero for the policy action as DROP for this below row")
+                print(firewall_policy_obj)
+                exit()
+
+        if firewall_policy_obj["protocol"] == "icmp" :
+            if not (str(firewall_policy_obj["src_port"])=="any" and str(firewall_policy_obj["dest_port"])=="any"):
+                print("The Source Port and Destination Port should be 'any' for protocol as icmp for this below row ")
+                print(firewall_policy_obj)
+                exit()
+            
+        else:
+            if not (is_valid_port(firewall_policy_obj["src_port"]) and is_valid_port(firewall_policy_obj["dest_port"]) ):
+                print("The Port Numbers given are not valid in the row below")
+                print(firewall_policy_obj)
+                exit()
+
         else:
             if firewall_policy_obj["src_port"] == "any":
                 firewall_policy_obj["src_port"] = "0-65535"

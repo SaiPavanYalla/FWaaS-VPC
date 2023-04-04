@@ -1,15 +1,5 @@
 # FWaaS-VPC
 
-This project is to create Firewall as a Service. VPC is 
-
-The Project has 2 directories. north_bound and south_bound.
-
-For the VPC has to be created.
-
-
-
-# FWaaS-VPC
-
 FWaaS-VPC is the project which provides Firewall as a Service. The customers can create their networks in Virtual Provide Cloud by providing their requirements. The Customer Network is then built based on the requirements provided by customer. The Customer can also create Firewall policies for their Networks.
 
 ## Table of Contents
