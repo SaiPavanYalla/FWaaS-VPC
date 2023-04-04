@@ -60,3 +60,29 @@
         log_level: warning
         state: present
       when: protocol == "icmp"
+
+    - name: Add iptables rule for FORWARD chain
+      iptables:
+        chain: FORWARD
+        table: filter
+        source: "{{ src_ip }}"
+        destination: "{{ dest_ip }}"
+        protocol: "{{ protocol }}"
+        source_port: "{{ src_port }}"
+        destination_port: "{{ dest_port }}"
+        limit: "{{ threshold }}/second"
+        jump: DROP
+        state: present
+      when: protocol != "icmp"
+
+    - name: Add iptables rule for ICMP in FORWARD chain
+      iptables:
+        chain: FORWARD
+        table: filter
+        source: "{{ src_ip }}"
+        destination: "{{ dest_ip }}"
+        protocol: icmp
+        limit: "{{ threshold }}/second"
+        jump: DROP
+        state: present
+      when: protocol == "icmp"
