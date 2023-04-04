@@ -8,11 +8,12 @@ import subprocess
 def is_valid_ipv4_address(address):
     try:
         ip_network = ipaddress.IPv4Network(address)
-        return (ip_network.is_private and not ip_network.is_multicast)
+        #return ( not ip_network.is_multicast)
     except ipaddress.AddressValueError:
         # The address is not a valid IPv4 address
         return False
-
+    return True
+    
 def is_valid_port(port):
     try:
         if str(port) == "any":
@@ -137,6 +138,8 @@ with open('firewallPolicies.csv', 'r') as file:
     for firewall_policy_obj in reader:
         if not (is_valid_ipv4_address(firewall_policy_obj["src_ip"]) and is_valid_ipv4_address(firewall_policy_obj["dest_ip"])):
             print("The IP addresses given are not valid in the row below")
+            print(is_valid_ipv4_address(firewall_policy_obj["src_ip"]))
+            print( is_valid_ipv4_address(firewall_policy_obj["dest_ip"]))
             print(firewall_policy_obj)
             exit()
 
