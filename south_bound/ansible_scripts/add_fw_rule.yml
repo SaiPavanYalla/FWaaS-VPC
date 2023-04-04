@@ -14,8 +14,22 @@
         source_port: "{{ src_port }}"
         destination_port: "{{ dest_port }}"
         limit: "{{ threshold }}/second"
-        jump: "{{policy_action}}"
+        jump: "{{ policy_action }}"
         state: present
+      when: protocol != "icmp"
+
+    - name: Add iptables rule for ICMP in FORWARD chain
+      iptables:
+        chain: FORWARD
+        table: filter
+        source: "{{ src_ip }}"
+        destination: "{{ dest_ip }}"
+        protocol: icmp
+        limit: "{{ threshold }}/second"
+        jump: ACCEPT
+        state: present
+      when: protocol == "icmp"
+
 
     - name: Add iptables rule to log dropped packets
       iptables:
@@ -31,3 +45,18 @@
         log_prefix: "{{ log_prefix }}"
         log_level: warning
         state: present
+      when: protocol != "icmp"
+
+    - name: Add iptables rule to log dropped packets
+      iptables:
+        chain: FORWARD
+        table: filter
+        source: "{{ src_ip }}"
+        destination: "{{ dest_ip }}"
+        protocol: icmp
+        limit: "{{ threshold }}/second"
+        jump: "LOG"
+        log_prefix: "{{ log_prefix }}"
+        log_level: warning
+        state: present
+      when: protocol == "icmp"
