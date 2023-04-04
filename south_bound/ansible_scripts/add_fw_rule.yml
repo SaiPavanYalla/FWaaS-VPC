@@ -13,8 +13,7 @@
         protocol: "{{ protocol }}"
         source_port: "{{ src_port }}"
         destination_port: "{{ dest_port }}"
-        conntrack:
-          ctstate: "NEW,RELATED,ESTABLISHED"
+        ctstate: "NEW,RELATED,ESTABLISHED"
         limit: "{{ threshold }}/second"
         jump: "{{ policy_action }}"
         state: present
@@ -26,8 +25,7 @@
         table: filter
         source: "{{ src_ip }}"
         destination: "{{ dest_ip }}"
-        conntrack:
-          ctstate: "NEW,RELATED,ESTABLISHED"
+        ctstate: "NEW,RELATED,ESTABLISHED"
         protocol: icmp
         limit: "{{ threshold }}/second"
         jump: ACCEPT
