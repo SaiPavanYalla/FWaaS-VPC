@@ -167,7 +167,12 @@ with open('firewallPolicies.csv', 'r') as file:
                 print(firewall_policy_obj)
                 exit()
 
-       
+        
+        if firewall_policy_obj["src_port"] == "any":
+            firewall_policy_obj["src_port"] = "0:65535"
+
+        if firewall_policy_obj["dest_port"] == "any":
+            firewall_policy_obj["dest_port"] = "0:65535"
 
 
         if not (firewall_policy_obj["policy_action"] == "ACCEPT" or firewall_policy_obj["policy_action"] == "DROP" ):
