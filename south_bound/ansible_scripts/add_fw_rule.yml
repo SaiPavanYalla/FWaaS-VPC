@@ -13,9 +13,10 @@
         protocol: "{{ protocol }}"
         source_port: "{{ src_port }}"
         destination_port: "{{ dest_port }}"
-        ctstate: "NEW,RELATED,ESTABLISHED"
+        ctstate: "RELATED,ESTABLISHED"
         limit: "{{ threshold }}/second"
         jump: "{{ policy_action }}"
+        insert: 1
         state: present
       when: protocol != "icmp"
 
@@ -25,10 +26,11 @@
         table: filter
         source: "{{ src_ip }}"
         destination: "{{ dest_ip }}"
-        ctstate: "NEW,RELATED,ESTABLISHED"
+        ctstate: "RELATED,ESTABLISHED"
         protocol: icmp
         limit: "{{ threshold }}/second"
         jump: ACCEPT
+        insert: 1
         state: present
       when: protocol == "icmp"
 
@@ -45,6 +47,7 @@
         jump: "LOG"
         log_prefix: "{{ log_prefix }}"
         log_level: warning
+        insert: 2
         state: present
       when: protocol != "icmp"
 
@@ -58,6 +61,7 @@
         jump: "LOG"
         log_prefix: "{{ log_prefix }}"
         log_level: warning
+        insert: 2
         state: present
       when: protocol == "icmp"
 
@@ -71,6 +75,7 @@
         source_port: "{{ src_port }}"
         destination_port: "{{ dest_port }}"
         jump: DROP
+        insert: 3
         state: present
       when: protocol != "icmp"
 
@@ -82,5 +87,6 @@
         destination: "{{ dest_ip }}"
         protocol: icmp
         jump: DROP
+        insert: 3
         state: present
       when: protocol == "icmp"
