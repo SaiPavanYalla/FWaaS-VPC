@@ -13,11 +13,6 @@
           - python3-libvirt
         state: present
 
-    - name: Get VMs list
-      community.libvirt.virt:
-        command: list_vms
-      register: existing_vms
-      changed_when: no
     - name: Copy base image to libvirt directory
       copy:
         dest: "{{ libvirt_pool_dir }}/{{ vm_name }}.qcow2"
