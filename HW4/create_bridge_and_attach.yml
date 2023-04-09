@@ -1,0 +1,52 @@
+---
+- name: Create and configure OVS bridge
+  hosts: localhost
+  become: yes
+  vars:
+    namespace_tenant: "NS1"
+    vm_name: "NS1VM1"
+    vm_net: "NS1_Net1"
+    vm_net_gateway: "192.168.1.1/24"
+    src_dir : "../south_bound/templates"
+
+  tasks:
+    - name: Create OVS bridge
+      openvswitch_bridge:
+        bridge: "{{ vm_net }}"
+        state: present
+
+    - name: Set OVS interface to UP
+      command: "ip link set {{ vm_net }} up"
+      
+    - name: Create veth pair
+      command: ip link add {{ vm_net }}_veth1 type veth peer name {{ vm_net }}_veth0
+
+    - name: Move veth peer to Namespace
+      command: ip link set {{ vm_net }}_veth0 netns {{ namespace_tenant }}
+
+    - name: adding veth pair to the bridge
+      command: ovs-vsctl add-port {{ vm_net }}  {{ vm_net }}_veth1
+
+    - name: Bring up veth peer
+      command: ip link set dev {{ vm_net }}_veth1 up
+
+    - name: Bring up veth in Namespace
+      command: ip netns exec {{ namespace_tenant }} ip link set dev {{ vm_net }}_veth0 up
+   
+
+    - name: Assign IP address
+      command: ip netns exec {{ namespace_tenant }} ip addr add {{ vm_net_gateway }} dev {{ vm_net }}_veth0
+
+    - name: push network template
+      template:
+        src: "{{ src_dir }}/interface-template.xml.j2"
+        dest: "{{ src_dir }}/{{ vm_name}}_{{ vm_net}}.xml"
+      register: template_result
+
+    - name: attach network to VM
+      command: virsh attach-device {{ vm_name}} {{template_result.dest }} --live --config
+
+    - name: Remove xml file
+      file:
+        path: "{{ template_result.dest }}"
+        state: absent

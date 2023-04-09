@@ -1,0 +1,56 @@
+---
+- name: Ensure requirements in place
+  hosts: localhost
+  become: yes
+  vars:
+    vm_name: "NS3VM1" 
+    libvirt_pool_dir: "/var/lib/libvirt/images"
+    src_dir : "../south_bound/templates"
+    vm_vcpus: "2"
+    vm_ram_mb: "2048" 
+  tasks:
+    - name: Install packages
+      package:
+        name:
+          - libguestfs-tools
+          - python3-libvirt
+        state: present
+
+   
+    - name: Copy base image to libvirt directory
+      copy:
+        dest: "{{ libvirt_pool_dir }}/{{ vm_name }}.qcow2"
+        src: "{{ src_dir }}/vm-template.qcow2"
+        force: no
+        remote_src: yes
+        mode: 0660
+      register: copy_results
+
+    
+
+    - name: Configure the image
+      command: |
+        virt-customize -a {{ libvirt_pool_dir }}/{{ vm_name }}.qcow2 \
+        --hostname {{ vm_name }} \
+        --no-network \
+        --firstboot-command "apt-get update" -x
+      when: copy_results is changed
+
+    - name: Create a new Ubuntu VM
+      block:
+
+        - name: define the new VM
+          virt:
+            command: define
+            autostart: yes
+            xml: "{{ lookup('template', '{{ src_dir }}/vm-template.xml.j2') }}"
+
+        - name: Start the new VM
+          virt:
+            name: "{{ vm_name }}"
+            state: running
+
+        - name: report created result
+          debug:
+            msg: "{{ vm_name }} created successfully"
+

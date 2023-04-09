@@ -40,11 +40,11 @@ def are_dicts_equal_except_key(d1, d2, key):
 
 firewall_policy_list = []
 
-tenant_name =  "team66"
-tenant_code = "123456"
+#tenant_name =  "team66"
+#tenant_code = "123456"
 
-#tenant_name = input("Please enter your Tenant Name: ") 
-#tenant_code = input("Please enter your Tenant Code: ") 
+tenant_name = input("Please enter your Tenant Name: ") 
+tenant_code = input("Please enter your Tenant Code: ") 
 
 
 network_data = {}
