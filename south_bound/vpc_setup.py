@@ -23,7 +23,7 @@ stdout, stderr = process.communicate(sudo_password.encode())
 
 
 if process.returncode != 0:
-    output = stderr.decode('utf-8') if stderr else stdout.decode('utf-8')    
+    output = stderr.decode('utf-8') if stderr else stdout.decode('utf-8')   
     print(f"Public Gateway creation failed with error:\n{output}")
 else:
     print(f"Public Gateway creation successfull")
