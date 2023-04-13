@@ -50,7 +50,7 @@
     - name: Enable IP forwarding
       sysctl:
         name: net.ipv4.ip_forward
-        value: 1
+        value: "1"
         state: present
         reload: yes
 
@@ -58,7 +58,7 @@
       command: iptables -t nat -I POSTROUTING 1 -s 10.0.0.0/30 ! -d 10.0.0.0/30 -j MASQUERADE
 
     - name: Configure NAT from Tenant
-      command: ip netns exec {{ namespace_name }} iptables -t nat -I POSTROUTING 2 -s 10.3.6.0/24 ! -d 10.3.6.0/24 -j MASQUERADE
+      command: ip netns exec {{ namespace_name }} iptables -t nat -I POSTROUTING 1 -s 10.3.6.0/24 ! -d 10.3.6.0/24 -j MASQUERADE
 
 
     - name: Create OVS bridge PGW
