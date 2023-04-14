@@ -5,6 +5,7 @@
   vars:
     vm_name: "NS3VM1" 
     libvirt_pool_dir: "/var/lib/libvirt/images"
+    src_dir : "../south_bound/templates"
     
     vm_vcpus: "2"
     vm_ram_mb: "2048" 
