@@ -1,0 +1,17 @@
+global_defs {
+   router_id LVS_DEVEL
+}
+
+vrrp_instance VI_1 {
+    state {{ state }}
+    interface {{vrrp_interface}}
+    virtual_router_id {{router_id}}
+    priority {{vrrp_priority}}
+    virtual_ipaddress {
+        {{virtual_ip}}
+    }
+    authentication {
+        auth_type PASS
+        auth_pass mypassword
+    }
+}

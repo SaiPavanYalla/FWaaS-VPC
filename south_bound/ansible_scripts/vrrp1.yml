@@ -1,0 +1,35 @@
+---
+- name: Provision VMs and configure active standby links
+  hosts: localhost
+
+  vars:
+    vm1_mac: "52:54:00:00:00:01"
+    vm1_ip: 192.168.0.10
+    router_id: 1
+    virtual_ip: 192.168.0.100
+    vrrp_interface: enp1s0
+    vrrp_priority: 101
+    state: "BACKUP"
+
+  tasks:
+    - name: Configure active standby links
+      become: true
+      vars:
+        interface_name: enp1s0
+      block:
+        - name: Install keepalived package
+          apt:
+            name: keepalived
+            state: present
+
+        - name: Configure keepalived
+          template:
+            src: keepalived.conf.j2
+            dest: /etc/keepalived/keepalived.conf
+            mode: "0644"
+
+        - name: Start keepalived service
+          service:
+            name: keepalived
+            state: started
+
