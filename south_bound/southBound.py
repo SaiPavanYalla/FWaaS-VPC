@@ -399,6 +399,33 @@ for tenant in  network_data:
                 print(f" create table to re-route traffic successfully created in {namespace_tenant}.")
         
 
+        #create firewall control plane
+        if firewall_data["status"]["firewall_status"] == "Completed" and firewall_data["status"]["internal_net_status"] == "Completed" and  firewall_data["status"]["external_net_status"] == "Completed" and firewall_data["status"]["internal_net_attach_status"] == "Completed" and  firewall_data["status"]["external_net_attach_status"] == "Completed" and firewall_data["status"]["fw_control_plane"] == "Ready":
+            inventory_path = os.path.join(cwd, "inventory.ini")
+            playbook_path = os.path.join(cwd, "ansible_scripts","fw_control_plane.yml")
+            namespace_tenant =  network_data[tenant]["namespace_tenant"]
+            hostname = "FW"
+
+            extra_vars = {'hostname': nostname ,'namespace_tenant' : namespace_tenant  }
+
+            command = ['sudo','ansible-playbook', playbook_path ,'-i', inventory_path]
+            sudo_password = "mmrj2023"
+
+            for key, value in extra_vars.items():
+                command.extend(['-e', f'{key}={value}'])
+            
+            firewall_data["status"]["fw_control_plane"] = "Running"  
+            process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
+            stdout, stderr = process.communicate(sudo_password.encode())
+
+            if process.returncode != 0:
+                output = stderr.decode('utf-8') if stderr else stdout.decode('utf-8')
+                firewall_data["status"]["fw_control_plane"] = "Ready"                
+                print(f"Ansible playbook failed with error while creating firewall control plane:\n{output}")
+            else:
+                firewall_data["status"]["fw_control_plane"] = "Completed"
+                print(f" create firewall control plane successfully created in {namespace_tenant}.")
+
 
 
 with open(network_json_file_path, "w") as outfile:

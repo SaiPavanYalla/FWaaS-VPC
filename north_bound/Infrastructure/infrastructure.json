@@ -152,7 +152,8 @@
                 "internal_net_attach_status": "Completed",
                 "external_net_attach_status": "Completed",
                 "mgmt_net_attach_status": "Completed",
-                "re_route_to_fw_int_status": "Completed"
+                "re_route_to_fw_int_status": "Completed",
+                "fw_control_plane" : "Ready"
             },
             "Policies": [
                 {
