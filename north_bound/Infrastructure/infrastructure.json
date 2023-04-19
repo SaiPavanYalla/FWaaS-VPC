@@ -1,92 +1,22 @@
 {
-    "team63": {
-        "tenant_name": "team63",
-        "tenant_code": "123456",
-        "VMs": [
-            {
-                "vm_name": "VM3",
-                "vm_vcpus": "2",
-                "vm_ram_mb": "2048",
-                "vm_disk_size": "10",
-                "connections": [
-                    {
-                        "Connected_to": [
-                            "net1",
-                            "net2"
-                        ]
-                    }
-                ],
-                "status": "Completed",
-                "connection_status": {
-                    "net1": "Completed",
-                    "net2": "Completed"
-                }
-            },
-            {
-                "vm_name": "VM4",
-                "vm_vcpus": "2",
-                "vm_ram_mb": "2048",
-                "vm_disk_size": "10",
-                "connections": [
-                    {
-                        "Connected_to": [
-                            "net1",
-                            "net2"
-                        ]
-                    }
-                ],
-                "status": "Completed",
-                "connection_status": {
-                    "net1": "Completed",
-                    "net2": "Completed"
-                }
-            }
-        ],
-        "Networks": [
-            {
-                "network_name": "net1",
-                "subnet": "192.168.11.0",
-                "mask": "255.255.255.0",
-                "status": "Completed"
-            },
-            {
-                "network_name": "net2",
-                "subnet": "192.168.12.0",
-                "mask": "255.255.255.0",
-                "status": "Completed"
-            }
-        ],
-        "Firewall": {
-            "firewall_vcpus": "2",
-            "firewall_ram_mb": "2048",
-            "firewall_disk_size": "10",
-            "status": {
-                "firewall_status": "Completed",
-                "internal_net_status": "Completed",
-                "external_net_status": "Completed",
-                "internal_net_attach_status": "Completed",
-                "external_net_attach_status": "Completed",
-                "mgmt_net_attach_status": "Completed",
-                "re_route_to_fw_int_status": "Completed"
-            },
-            "Policies": [
-                {
-                    "src_ip": "192.168.12.0/24",
-                    "src_port": "0:65535",
-                    "dest_ip": "8.8.8.8/32",
-                    "dest_port": "0:65535",
-                    "protocol": "icmp",
-                    "policy_action": "ACCEPT",
-                    "threshold": "2",
-                    "status": "Completed"
-                }
-            ]
-        },
-        "namespace_tenant": "T2"
-    },
     "team66": {
+        "namespace_tenant": "T1",
         "tenant_name": "team66",
         "tenant_code": "123456",
+        "Networks": [
+            {
+                "network_name": "net1",
+                "subnet": "192.168.11.0",
+                "mask": "255.255.255.0",
+                "status": "Completed"
+            },
+            {
+                "network_name": "net2",
+                "subnet": "192.168.12.0",
+                "mask": "255.255.255.0",
+                "status": "Completed"
+            }
+        ],
         "VMs": [
             {
                 "vm_name": "VM3",
@@ -127,57 +57,38 @@
                 }
             }
         ],
-        "Networks": [
-            {
-                "network_name": "net1",
-                "subnet": "192.168.11.0",
-                "mask": "255.255.255.0",
-                "status": "Completed"
-            },
-            {
-                "network_name": "net2",
-                "subnet": "192.168.12.0",
-                "mask": "255.255.255.0",
-                "status": "Completed"
-            }
-        ],
         "Firewall": {
-            "firewall_vcpus": "2",
-            "firewall_ram_mb": "2048",
-            "firewall_disk_size": "10",
             "status": {
-                "firewall_status": "Completed",
-                "internal_net_status": "Completed",
-                "external_net_status": "Completed",
-                "internal_net_attach_status": "Completed",
-                "external_net_attach_status": "Completed",
-                "mgmt_net_attach_status": "Completed",
                 "re_route_to_fw_int_status": "Completed",
-                "fw_control_plane" : "Ready"
+                "internal_net_status": "Completed",
+                "external_net_status": "Completed"
             },
-            "Policies": [
-                {
-                    "src_ip": "192.168.12.0/24",
-                    "src_port": "0-65535",
-                    "dest_ip": "8.8.8.8/32",
-                    "dest_port": "0-65535",
-                    "protocol": "icmp",
-                    "policy_action": "ACCEPT",
-                    "threshold": "2",
-                    "status": "Completed"
-                },
-                {
-                    "src_ip": "192.168.11.0/24",
-                    "src_port": "0-65535",
-                    "dest_ip": "8.8.8.8/32",
-                    "dest_port": "0-65535",
-                    "protocol": "icmp",
-                    "policy_action": "ACCEPT",
-                    "threshold": "2",
-                    "status": "Completed"
+            "Firewall_master": {
+                "firewall_vcpus": "2",
+                "firewall_ram_mb": "2048",
+                "firewall_disk_size": "10",
+                "status": {
+                    "firewall_status": "Completed",
+                    "internal_net_attach_status": "Completed",
+                    "external_net_attach_status": "Completed",
+                    "mgmt_net_attach_status": "Completed",
+                    "fw_control_plane": "Completed",
+                    "vrrp_status": "Completed"
                 }
-            ]
-        },
-        "namespace_tenant": "T3"
+            },
+            "Firewall_backup": {
+                "firewall_vcpus": "2",
+                "firewall_ram_mb": "2048",
+                "firewall_disk_size": "10",
+                "status": {
+                    "firewall_status": "Completed",
+                    "internal_net_attach_status": "Completed",
+                    "external_net_attach_status": "Completed",
+                    "mgmt_net_attach_status": "Completed",
+                    "fw_control_plane": "Completed",
+                    "vrrp_status": "Completed"
+                }
+            }
+        }
     }
 }

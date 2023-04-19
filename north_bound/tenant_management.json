@@ -5,19 +5,19 @@
         "tenant_code": "123456"
     },
     "T2": {
-        "status": "true",
-        "tenant_name": "team34",
-        "tenant_code": "123456"
+        "status": "false",
+        "tenant_name": "",
+        "tenant_code": ""
     },
     "T3": {
-        "status": "true",
-        "tenant_name": "team1",
-        "tenant_code": "123456"
+        "status": "false",
+        "tenant_name": "",
+        "tenant_code": ""
     },
     "T4": {
-        "status": "true",
-        "tenant_name": "team20",
-        "tenant_code": "123456"
+        "status": "false",
+        "tenant_name": "",
+        "tenant_code": ""
     },
     "T5": {
         "status": "false",

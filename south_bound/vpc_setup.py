@@ -55,8 +55,8 @@ if process.returncode != 0:
     output = stderr.decode('utf-8') if stderr else stdout.decode('utf-8')
     
     
-    print(f"Ansible playbook failed with error while creating a management network :\n{output}")
+    print(f"Failed with error while creating a management network :\n{output}")
 else:
-    print(f"Ansible playbook successfull while creating a management network")
+    print(f"successfull while creating a management network")
 
 

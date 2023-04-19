@@ -1,5 +1,5 @@
 - name: Configure Initial setup on FW
-  hosts: {{ namespace_tenant }}{{ hostname }}
+  hosts: "{{ namespace_tenant }}{{ hostname }}"
   become: true    
   vars:
     IN_int: "enp8s0"

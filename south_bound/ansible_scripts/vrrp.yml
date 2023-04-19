@@ -1,21 +1,18 @@
 ---
-- name: Provision VMs and configure active standby links
-  hosts: localhost
+- name: Configure VRRP
+  hosts: "{{ namespace_tenant }}{{ hostname }}"
 
   vars:
-    vm1_mac: "52:54:00:00:00:01"
-    vm1_ip: 192.168.0.10
-    router_id: 1
-    virtual_ip: 192.168.0.100
-    vrrp_interface: enp1s0
-    vrrp_priority: 101
-    state: "BACKUP"
+
+    virtual_ip: 10.7.7.100
+    vrrp_interface: enp8s0
+   
 
   tasks:
     - name: Configure active standby links
       become: true
       vars:
-        interface_name: enp1s0
+        interface_name: "{{vrrp_interface}}"
       block:
         - name: Install keepalived package
           apt:

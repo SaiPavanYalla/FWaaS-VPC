@@ -3,6 +3,7 @@ import json
 import shutil
 import ipaddress
 import datetime
+from copy import deepcopy
 
 def validate_subnet_mask(subnet_mask):
     try:
@@ -50,7 +51,11 @@ if flag_if_present == False:
     print("Please enter Tenant details which are part of the VPC")
     exit()
 
-tenant_data["namespace_tenant"] = namespace
+#tenant_data["namespace_tenant"] = namespace
+
+new_dict = {"namespace_tenant": namespace }
+new_dict.update(tenant_data)
+tenant_data = new_dict
 
 source_path = os.getcwd() + "/" + input_sample_json
 destination_path = os.path.join(os.getcwd(),"tenantTopology",tenant_name,"inputTopology_" + str(datetime.datetime.now()) + ".json")
@@ -122,9 +127,9 @@ if network_duplicates:
     
 
 
-
-tenant_data['VMs'] = vms
 tenant_data['Networks'] = networks
+tenant_data['VMs'] = vms
+
 
 
 #Now comes the appending part
@@ -193,15 +198,25 @@ else:
     existing_network_data[tenant_name]= tenant_data
 
 if "Firewall" in tenant_data.keys():
-    existing_network_data[tenant_name]["Firewall"]= tenant_data["Firewall"]
-    existing_network_data[tenant_name]["Firewall"]["status"] = {"firewall_status":"Ready","internal_net_status":"Ready","external_net_status":"Ready","internal_net_attach_status":"Ready","external_net_attach_status":"Ready","mgmt_net_attach_status":"Ready","re_route_to_fw_int_status":"Ready","fw_control_plane":"Ready"}
+    temp1 = deepcopy(tenant_data["Firewall"])
+
+    #print(temp1)
+    temp2 = deepcopy(tenant_data["Firewall"])
+
+    existing_network_data[tenant_name]["Firewall"] = {}
+    existing_network_data[tenant_name]["Firewall"]["status"] ={"re_route_to_fw_int_status":"Ready"}
+    existing_network_data[tenant_name]["Firewall"]["Firewall_master"] = temp1
+    existing_network_data[tenant_name]["Firewall"]["Firewall_master"]["status"] = {"firewall_status":"Ready","internal_net_status":"Ready","external_net_status":"Ready","internal_net_attach_status":"Ready","external_net_attach_status":"Ready","mgmt_net_attach_status":"Ready","fw_control_plane":"Ready","vrrp_status":"Ready"}
+
+    existing_network_data[tenant_name]["Firewall"]["Firewall_backup"] = temp2
+    existing_network_data[tenant_name]["Firewall"]["Firewall_backup"]["status"] = {"firewall_status":"Ready","internal_net_status":"Ready","external_net_status":"Ready","internal_net_attach_status":"Ready","external_net_attach_status":"Ready","mgmt_net_attach_status":"Ready","fw_control_plane":"Ready","vrrp_status":"Ready"}
 
 
-
-
+#print(existing_network_data)
 
 with open(network_destination_path + "/" + "infrastructure.json", "w") as f1:
     json.dump(existing_network_data, f1,indent=4)
+    print("Infrastructure details updated Successfully")
 
 
 if not os.path.exists(os.path.join(os.getcwd(), "tenantTopology")):
