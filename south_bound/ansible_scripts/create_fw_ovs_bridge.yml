@@ -47,7 +47,6 @@
         line: "{{ item }}"
       with_items:
         - "strict-order"
-        - "user=libvirt-dnsmasq"
         - "except-interface=lo"
         - "bind-dynamic"
         - "interface={{ vm_net }}_veth0"
@@ -55,6 +54,9 @@
         - "dhcp-no-override"
         - "dhcp-authoritative"
         - "dhcp-lease-max=253"
+        - "dhcp-option=option:router,{{tenant_net_gw_ip}}"
+        - "dhcp-option=option:dns-server,8.8.8.8"
+        - "dhcp-leasefile=/var/lib/misc/dnsmasq.leases"
 
     - name: run the DHCP file with dnsmasq
       command: "ip netns exec {{namespace_tenant}} dnsmasq -C {{vm_net}}.conf"
