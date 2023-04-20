@@ -623,11 +623,14 @@ for tenant in  network_data:
             router_id = 1
             vrrp_priority = 101
             state = "MASTER"
+            src_dir = os.path.join(cwd , "templates")
             extra_vars = {'namespace_tenant': namespace_tenant,
               'hostname': hostname,
             'router_id': router_id,
              'vrrp_priority': vrrp_priority,
-            'state': state   }
+            'state': state,
+            'src_dir' :src_dir   }
+            
 
             command = ['sudo','ansible-playbook', playbook_path ,'-i', inventory_path]
             sudo_password = "mmrj2023"
@@ -658,11 +661,13 @@ for tenant in  network_data:
             router_id = 2
             vrrp_priority = 100
             state = "BACKUP"
+            src_dir = os.path.join(cwd , "templates")
             extra_vars = {'namespace_tenant': namespace_tenant,
               'hostname': hostname,
             'router_id': router_id,
              'vrrp_priority': vrrp_priority,
-            'state': state   }
+            'state': state ,
+            'src_dir':src_dir  }
 
             command = ['sudo','ansible-playbook', playbook_path ,'-i', inventory_path]
             sudo_password = "mmrj2023"

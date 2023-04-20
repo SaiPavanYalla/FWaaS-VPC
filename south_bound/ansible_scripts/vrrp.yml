@@ -21,7 +21,7 @@
 
         - name: Configure keepalived
           template:
-            src: keepalived.conf.j2
+            src: "{{src_dir}}/keepalived.conf.j2"
             dest: /etc/keepalived/keepalived.conf
             mode: "0644"
 

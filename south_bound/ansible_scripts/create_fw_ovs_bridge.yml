@@ -4,7 +4,7 @@
   become: yes
   vars:
     vm_net: "{{ namespace_tenant }}_{{vm_net_name}}"
-    dhcp_mask: 255.255.255.252
+    dhcp_mask: 255.255.255.0
     
 
   tasks:
@@ -37,13 +37,13 @@
     - name: Create the DHCP file in Namespace
       become: true
       file:
-        path: "/etc/netns/{{ namespace_tenant }}/{{ vm_net }}.conf"
+        path: "{{ vm_net }}.conf"
         state: touch
 
     
     - name: Add lines to DHCP file
       lineinfile:
-        path: "/etc/netns/{{ namespace_tenant }}/{{ vm_net }}.conf"
+        path: "{{ vm_net }}.conf"
         line: "{{ item }}"
       with_items:
         - "strict-order"
@@ -57,7 +57,7 @@
         - "dhcp-lease-max=253"
 
     - name: run the DHCP file with dnsmasq
-      command: "ip netns exec {{namespace_tenant}} dnsmasq -C /etc/netns/{{namespace_tenant}}/{{vm_net}}.conf"
+      command: "ip netns exec {{namespace_tenant}} dnsmasq -C {{vm_net}}.conf"
 
     # - name: copy file from namespace to host
     #   command: cp /etc/netns/{{ namespace_tenant }}/{{ vm_net }}.conf /etc/{{ vm_net }}.conf
