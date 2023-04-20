@@ -90,5 +90,45 @@
                 }
             }
         }
+    },
+    "team10": {
+        "namespace_tenant": "T2",
+        "tenant_name": "team10",
+        "tenant_code": "123456",
+        "Networks": [],
+        "VMs": [],
+        "Firewall": {
+            "status": {
+                "re_route_to_fw_int_status": "Completed",
+                "internal_net_status": "Completed",
+                "external_net_status": "Completed"
+            },
+            "Firewall_master": {
+                "firewall_vcpus": "2",
+                "firewall_ram_mb": "2048",
+                "firewall_disk_size": "10",
+                "status": {
+                    "firewall_status": "Completed",
+                    "internal_net_attach_status": "Completed",
+                    "external_net_attach_status": "Completed",
+                    "mgmt_net_attach_status": "Completed",
+                    "fw_control_plane": "Completed",
+                    "vrrp_status": "Completed"
+                }
+            },
+            "Firewall_backup": {
+                "firewall_vcpus": "2",
+                "firewall_ram_mb": "2048",
+                "firewall_disk_size": "10",
+                "status": {
+                    "firewall_status": "Completed",
+                    "internal_net_attach_status": "Completed",
+                    "external_net_attach_status": "Completed",
+                    "mgmt_net_attach_status": "Completed",
+                    "fw_control_plane": "Completed",
+                    "vrrp_status": "Completed"
+                }
+            }
+        }
     }
 }

@@ -204,12 +204,14 @@ if "Firewall" in tenant_data.keys():
     temp2 = deepcopy(tenant_data["Firewall"])
 
     existing_network_data[tenant_name]["Firewall"] = {}
-    existing_network_data[tenant_name]["Firewall"]["status"] ={"re_route_to_fw_int_status":"Ready"}
+    existing_network_data[tenant_name]["Firewall"]["status"] ={"re_route_to_fw_int_status":"Ready","internal_net_status": "Ready",
+                "external_net_status": "Ready"}
+
     existing_network_data[tenant_name]["Firewall"]["Firewall_master"] = temp1
-    existing_network_data[tenant_name]["Firewall"]["Firewall_master"]["status"] = {"firewall_status":"Ready","internal_net_status":"Ready","external_net_status":"Ready","internal_net_attach_status":"Ready","external_net_attach_status":"Ready","mgmt_net_attach_status":"Ready","fw_control_plane":"Ready","vrrp_status":"Ready"}
+    existing_network_data[tenant_name]["Firewall"]["Firewall_master"]["status"] = {"firewall_status":"Ready","internal_net_attach_status":"Ready","external_net_attach_status":"Ready","mgmt_net_attach_status":"Ready","fw_control_plane":"Ready","vrrp_status":"Ready"}
 
     existing_network_data[tenant_name]["Firewall"]["Firewall_backup"] = temp2
-    existing_network_data[tenant_name]["Firewall"]["Firewall_backup"]["status"] = {"firewall_status":"Ready","internal_net_status":"Ready","external_net_status":"Ready","internal_net_attach_status":"Ready","external_net_attach_status":"Ready","mgmt_net_attach_status":"Ready","fw_control_plane":"Ready","vrrp_status":"Ready"}
+    existing_network_data[tenant_name]["Firewall"]["Firewall_backup"]["status"] = {"firewall_status":"Ready","internal_net_attach_status":"Ready","external_net_attach_status":"Ready","mgmt_net_attach_status":"Ready","fw_control_plane":"Ready","vrrp_status":"Ready"}
 
 
 #print(existing_network_data)
