@@ -31,7 +31,7 @@
         virt-customize -a {{ libvirt_pool_dir }}/{{ vm_name }}.qcow2 \
         --hostname {{ vm_name }} \
         --no-network \
-        --firstboot-command "apt-get update" -x
+        --firstboot-command "rm -f /etc/machine-id; rm /var/lib/dbus/machine-id; dbus-uuidgen --ensure; systemd-machine-id-setup; apt-get update" -x
       when: copy_results is changed
 
     - name: Create a new Ubuntu VM
